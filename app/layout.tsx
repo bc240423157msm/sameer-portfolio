@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import "@fontsource-variable/inter/standard.css";
+import { CursorTrail } from "@/components/common/CursorTrail";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   personJsonLd,
@@ -7,20 +8,17 @@ import {
   websiteJsonLd,
 } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
+import { themeInitScript } from "@/lib/theme-script";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-  preload: true,
-});
-
 export const viewport: Viewport = {
-  themeColor: "#3b82f6",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1210" },
+  ],
   width: "device-width",
   initialScale: 1,
-  colorScheme: "dark",
+  colorScheme: "dark light",
 };
 
 export const metadata: Metadata = {
@@ -38,6 +36,11 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
+  },
+  alternates: {
+    types: {
+      "application/rss+xml": `${siteConfig.url}/feed.xml`,
+    },
   },
   openGraph: {
     title: siteConfig.title,
@@ -76,8 +79,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
@@ -86,6 +90,7 @@ export default function RootLayout({
         <JsonLd
           data={[personJsonLd(), websiteJsonLd(), professionalServiceJsonLd()]}
         />
+        <CursorTrail />
         {children}
       </body>
     </html>

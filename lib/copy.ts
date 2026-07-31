@@ -421,24 +421,24 @@ export const defaultTestimonials = [
     id: "1",
     quote:
       "The website redesign completely transformed our online presence. Modern design, fast loading, and exactly what our business needed.",
-    author: "Client",
-    role: "E-commerce Business Owner",
+    author: "Nasir Zeeshan",
+    role: "Founder, Furniflair.com",
     rating: 5,
   },
   {
     id: "2",
     quote:
       "Our WhatsApp bot handles customer inquiries 24/7. It saves our team hours every day and improved response times dramatically.",
-    author: "Client",
-    role: "Service Business Owner",
+    author: "Virtual University",
+    role: "Client, AI WhatsApp Bot Project",
     rating: 5,
   },
   {
     id: "3",
     quote:
       "Professional WordPress website design with great attention to detail. The site is fast, SEO-friendly, and easy for us to manage.",
-    author: "Client",
-    role: "Small Business Owner",
+    author: "Arslan Bhatti",
+    role: "Client, PascalineSoft Project",
     rating: 5,
   },
 ];

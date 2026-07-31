@@ -31,6 +31,15 @@ interface PageMetadataOptions {
   noIndex?: boolean;
   type?: "website" | "article";
   publishedTime?: string;
+  modifiedTime?: string;
+  /** Absolute or site-relative OG/Twitter image URL */
+  image?: string;
+}
+
+function resolveImageUrl(image?: string): string | undefined {
+  if (!image) return `${siteConfig.url}/opengraph-image`;
+  if (image.startsWith("http")) return image;
+  return `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`;
 }
 
 export function createPageMetadata({
@@ -41,10 +50,13 @@ export function createPageMetadata({
   noIndex = false,
   type = "website",
   publishedTime,
+  modifiedTime,
+  image,
 }: PageMetadataOptions): Metadata {
   const url = `${siteConfig.url}${path}`;
   const fullTitle =
     path === "" ? siteConfig.title : `${title} | ${siteConfig.name}`;
+  const ogImage = resolveImageUrl(image);
 
   return {
     title: path === "" ? { absolute: siteConfig.title } : title,
@@ -54,7 +66,10 @@ export function createPageMetadata({
     creator: siteConfig.name,
     publisher: siteConfig.name,
     metadataBase: new URL(siteConfig.url),
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      types: path === "/blog" ? { "application/rss+xml": `${siteConfig.url}/feed.xml` } : undefined,
+    },
     openGraph: {
       title: fullTitle,
       description,
@@ -62,12 +77,19 @@ export function createPageMetadata({
       siteName: siteConfig.name,
       type,
       locale: "en_US",
-      ...(type === "article" && publishedTime ? { publishedTime } : {}),
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : undefined,
+      ...(type === "article" && publishedTime
+        ? {
+            publishedTime,
+            ...(modifiedTime ? { modifiedTime } : {}),
+          }
+        : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
+      images: ogImage ? [ogImage] : undefined,
       creator: `@${siteConfig.name.replace(/\s/g, "")}`,
     },
     robots: noIndex
@@ -115,6 +137,14 @@ export function websiteJsonLd() {
     description: siteConfig.description,
     inLanguage: "en-US",
     publisher: { "@type": "Person", name: siteConfig.name },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteConfig.url}/blog?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
   };
 }
 
@@ -155,12 +185,22 @@ export function articleJsonLd({
   description,
   slug,
   publishedAt,
+  modifiedAt,
+  image,
 }: {
   title: string;
   description: string;
   slug: string;
   publishedAt: string;
+  modifiedAt?: string;
+  image?: string;
 }) {
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`
+    : undefined;
+
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -168,14 +208,81 @@ export function articleJsonLd({
     description,
     url: `${siteConfig.url}/blog/${slug}`,
     datePublished: publishedAt,
-    dateModified: publishedAt,
+    dateModified: modifiedAt ?? publishedAt,
+    ...(imageUrl ? { image: [imageUrl] } : {}),
     author: {
       "@type": "Person",
       name: siteConfig.name,
       url: siteConfig.url,
     },
-    publisher: { "@type": "Person", name: siteConfig.name },
+    publisher: {
+      "@type": "Person",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/blog/${slug}`,
+    },
     inLanguage: "en-US",
+  };
+}
+
+export function webPageJsonLd({
+  title,
+  description,
+  path,
+}: {
+  title: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    url: `${siteConfig.url}${path}`,
+    inLanguage: "en-US",
+    isPartOf: { "@type": "WebSite", url: siteConfig.url, name: siteConfig.name },
+  };
+}
+
+export function itemListJsonLd(
+  items: { name: string; description: string; url: string }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Service",
+        name: item.name,
+        description: item.description,
+        url: item.url,
+      },
+    })),
+  };
+}
+
+export function blogListingJsonLd(
+  posts: { title: string; slug: string; excerpt: string; createdAt: string }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: `${siteConfig.name} Blog`,
+    url: `${siteConfig.url}/blog`,
+    description: "Web development, SEO, and automation insights.",
+    blogPost: posts.slice(0, 10).map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.excerpt,
+      url: `${siteConfig.url}/blog/${post.slug}`,
+      datePublished: post.createdAt,
+    })),
   };
 }
 

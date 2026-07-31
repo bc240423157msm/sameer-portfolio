@@ -25,6 +25,7 @@ export const navLinks: NavLink[] = [
 ];
 
 export const footerLinks: NavLink[] = [
+  { label: "Leave a Review", href: "/leave-a-review" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms", href: "/terms" },
 ];
@@ -32,22 +33,22 @@ export const footerLinks: NavLink[] = [
 export const socialLinks: SocialLink[] = [
   {
     label: "GitHub",
-    href: "https://github.com/sameermalik",
+    href: "https://github.com/bc240423157msm",
     external: true,
   },
   {
     label: "LinkedIn",
-    href: "https://linkedin.com/in/sameermalik",
+    href: "https://linkedin.com/in/sameermalik400",
     external: true,
   },
   {
     label: "Upwork",
-    href: "https://upwork.com/freelancers/~sameermalik",
+    href: "https://www.upwork.com/freelancers/~0185021876ca3ab5af",
     external: true,
   },
   {
     label: "Fiverr",
-    href: "https://fiverr.com/sameermalik",
+    href: "https://www.fiverr.com/sellers/msameermalik786/",
     external: true,
   },
 ];

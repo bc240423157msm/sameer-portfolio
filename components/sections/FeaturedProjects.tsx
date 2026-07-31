@@ -1,21 +1,21 @@
-"use client";
-
-import Image from "next/image";
-import { ArrowRight, ExternalLink } from "lucide-react";
-import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import {
   MotionReveal,
   StaggerContainer,
   StaggerItem,
 } from "@/components/common/MotionReveal";
-import { Badge } from "@/components/ui/Badge";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { featuredProjects } from "@/lib/content";
+import { FeaturedProjectCard } from "@/components/sections/ProjectCards";
+import { getSiteContent } from "@/lib/data";
 
-export function FeaturedProjects() {
+export async function FeaturedProjects() {
+  const content = await getSiteContent();
+  const projects = content.portfolio.slice(0, 3);
+
+  if (projects.length === 0) return null;
+
   return (
-    <section className="border-b border-border/60 py-24">
+    <section className="border-b border-border/60 bg-surface/50 py-24">
       <Container>
         <MotionReveal>
           <SectionHeading
@@ -26,52 +26,9 @@ export function FeaturedProjects() {
         </MotionReveal>
 
         <StaggerContainer className="mt-16 grid gap-6 md:grid-cols-3">
-          {featuredProjects.map((project) => (
-            <StaggerItem key={project.title}>
-              <Link
-                href={project.href}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/40 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
-              >
-                {/* PROJECT IMAGE — swap the `image` field in lib/content.ts to change this. */}
-                <div className="relative h-48 w-full overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={`${project.title} — ${project.subtitle}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-lg font-semibold text-text-primary drop-shadow">
-                      {project.title}
-                    </p>
-                    <p className="mt-0.5 text-sm text-text-secondary drop-shadow">
-                      {project.subtitle}
-                    </p>
-                  </div>
-                  <div className="absolute right-4 top-4 rounded-lg border border-border/60 bg-background/60 p-2 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-                    <ExternalLink className="h-4 w-4 text-text-secondary" />
-                  </div>
-                </div>
-
-                <div className="flex flex-1 flex-col p-6">
-                  <p className="flex-1 text-sm leading-relaxed text-text-secondary">
-                    {project.description}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {project.technologies.map((tech) => (
-                      <Badge key={tech}>{tech}</Badge>
-                    ))}
-                  </div>
-
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors group-hover:text-primary">
-                    View Project
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
+          {projects.map((project) => (
+            <StaggerItem key={project.slug}>
+              <FeaturedProjectCard project={project} />
             </StaggerItem>
           ))}
         </StaggerContainer>

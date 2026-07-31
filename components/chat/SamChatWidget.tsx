@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SAM_GREETING, SAM_NAME, SAM_TAGLINE } from "@/lib/sam-config";
-import type { ChatAttachment, ChatMessage } from "@/types/chat";
+import type { ChatMessage } from "@/types/chat";
 import { EmojiPicker } from "./EmojiPicker";
 
 const STORAGE_KEY = "sam-chat-messages";
@@ -50,8 +50,8 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 export function SamChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isOpen, setIsOpenRaw] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages());
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -61,12 +61,28 @@ export function SamChatWidget() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const stored = loadMessages();
-    if (stored.length > 0) {
-      setMessages(stored);
-    }
-  }, []);
+  // Opens the widget and seeds the greeting message the first time it's
+  // opened (instead of doing it as a side effect on state change).
+  function setIsOpen(next: boolean | ((prev: boolean) => boolean)) {
+    setIsOpenRaw((prev) => {
+      const value = typeof next === "function" ? next(prev) : next;
+      if (value) {
+        setMessages((current) =>
+          current.length === 0
+            ? [
+                {
+                  id: "greeting",
+                  role: "assistant",
+                  content: SAM_GREETING,
+                  timestamp: Date.now(),
+                },
+              ]
+            : current
+        );
+      }
+      return value;
+    });
+  }
 
   useEffect(() => {
     if (messages.length > 0) saveMessages(messages);
@@ -77,19 +93,6 @@ export function SamChatWidget() {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen, loading]);
-
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([
-        {
-          id: "greeting",
-          role: "assistant",
-          content: SAM_GREETING,
-          timestamp: Date.now(),
-        },
-      ]);
-    }
-  }, [isOpen, messages.length]);
 
   function clearPendingFile() {
     if (pendingPreview) URL.revokeObjectURL(pendingPreview);

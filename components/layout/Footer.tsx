@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
-import { footerLinks, navLinks, siteConfig, socialLinks } from "@/lib/site-config";
+import { NewsletterSignup } from "@/components/common/NewsletterSignup";
+import { SocialIcon } from "@/components/common/SocialIcon";
+import { footerLinks, navLinks, siteConfig } from "@/lib/site-config";
+import type { SocialLink } from "@/types/content";
 
-export function Footer() {
+interface FooterProps {
+  socialLinks?: SocialLink[];
+}
+
+export function Footer({ socialLinks = [] }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -22,6 +29,7 @@ export function Footer() {
               fast, SEO-friendly websites and intelligent automation for
               businesses worldwide.
             </p>
+            <NewsletterSignup />
           </div>
 
           <nav aria-label="Footer navigation">
@@ -42,28 +50,23 @@ export function Footer() {
 
           <nav aria-label="Social links">
             <p className="text-sm font-medium text-text-primary">Connect</p>
-            <ul className="mt-4 space-y-2.5">
-              {socialLinks.map((link) => (
-                <li key={link.label}>
-                  {link.external ? (
+            <ul className="mt-4 flex flex-wrap gap-3">
+              {socialLinks
+                .filter((link) => link.href?.trim())
+                .map((link) => (
+                  <li key={link.id}>
                     <a
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+                      aria-label={link.label}
+                      title={link.label}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-secondary transition-colors hover:border-primary hover:text-primary"
                     >
-                      {link.label}
+                      <SocialIcon platform={link.platform} className="h-[18px] w-[18px]" />
                     </a>
-                  ) : (
-                    <Link
-                      href={link.href}
-                      className="text-sm text-text-secondary transition-colors hover:text-text-primary"
-                    >
-                      {link.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
+                  </li>
+                ))}
             </ul>
           </nav>
         </div>

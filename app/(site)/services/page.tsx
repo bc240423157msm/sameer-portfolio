@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/Badge";
 import { CTASectionWrapper } from "@/components/sections/CTASectionWrapper";
 import { developmentProcess, whyWorkWithMe } from "@/lib/copy";
 import { getSiteContent } from "@/lib/data";
-import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, createPageMetadata, itemListJsonLd } from "@/lib/seo";
+import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Services",
@@ -32,10 +33,19 @@ export default async function ServicesPage() {
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Services", path: "/services" },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Services", path: "/services" },
+          ]),
+          itemListJsonLd(
+            content.services.map((s) => ({
+              name: s.title,
+              description: s.shortDescription,
+              url: `${siteConfig.url}/services#${s.id}`,
+            }))
+          ),
+        ]}
       />
       <PageHero
         variant="services"
@@ -77,7 +87,7 @@ export default async function ServicesPage() {
                     </ul>
                   </div>
 
-                  <div className="rounded-xl border border-border/40 bg-surface/50 p-6">
+                  <div className="rounded-xl border border-border/40 bg-surface/30 p-6">
                     <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
                       Technologies
                     </p>
@@ -94,7 +104,7 @@ export default async function ServicesPage() {
         </Container>
       </section>
 
-      <section className="border-y border-border/60 bg-surface/30 py-24">
+      <section className="border-y border-border/60 bg-surface/50 py-24">
         <Container>
           <SectionHeading
             eyebrow="Why Work With Me"

@@ -51,3 +51,38 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+/** Lets the logged-in user update their own profile picture / email without
+ * re-entering their password. Works for both built-in and dashboard-created
+ * accounts (unlike the password/username change above, which is builtin-only). */
+export async function PATCH(request: Request) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  }
+
+  try {
+    const { avatarUrl, email } = (await request.json()) as {
+      avatarUrl?: string;
+      email?: string;
+    };
+
+    if (await isExtraUser(session.username)) {
+      const { updateExtraUserProfile } = await import("@/lib/users");
+      await updateExtraUserProfile(session.username, { avatarUrl, email });
+    } else {
+      if (avatarUrl !== undefined) {
+        const { updateBuiltinAvatar } = await import("@/lib/users");
+        await updateBuiltinAvatar(session.role, avatarUrl);
+      }
+      if (email !== undefined) {
+        const { setBuiltinEmail } = await import("@/lib/users");
+        await setBuiltinEmail(session.role, email);
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

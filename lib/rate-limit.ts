@@ -1,13 +1,10 @@
 /**
- * Minimal in-memory sliding-window rate limiter.
- *
- * Good enough to stop casual brute-force / spam on a single-instance
- * deployment (e.g. a VPS or a single long-running Node process). It is
- * NOT shared across serverless function instances — if you deploy to a
- * platform that spins up multiple isolated instances (Vercel, etc.),
- * pair this with an edge/IP-based rate limiter (e.g. Upstash Redis,
- * Vercel Firewall rules) for real protection in production.
+ * Sliding-window rate limiter backed by Upstash Redis when configured,
+ * with an in-memory fallback for local development.
  */
+
+import { isDbConfigured } from "@/lib/kv";
+import { Redis } from "@upstash/redis";
 
 interface Bucket {
   count: number;
@@ -15,9 +12,18 @@ interface Bucket {
 }
 
 const buckets = new Map<string, Bucket>();
-
-// Prevent unbounded memory growth if the process runs for a long time.
 const MAX_TRACKED_KEYS = 5000;
+
+const redis =
+  isDbConfigured
+    ? new Redis({
+        url:
+          process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL!,
+        token:
+          process.env.KV_REST_API_TOKEN ||
+          process.env.UPSTASH_REDIS_REST_TOKEN!,
+      })
+    : null;
 
 export interface RateLimitResult {
   success: boolean;
@@ -25,12 +31,31 @@ export interface RateLimitResult {
   resetAt: number;
 }
 
-/**
- * @param key unique identifier for the caller, e.g. `login:${ip}`
- * @param limit max requests allowed within the window
- * @param windowMs window size in milliseconds
- */
-export function rateLimit(
+async function rateLimitRedis(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<RateLimitResult> {
+  const now = Date.now();
+  const redisKey = `ratelimit:${key}`;
+  const windowSec = Math.ceil(windowMs / 1000);
+
+  const count = await redis!.incr(redisKey);
+  if (count === 1) {
+    await redis!.expire(redisKey, windowSec);
+  }
+
+  const ttl = await redis!.ttl(redisKey);
+  const resetAt = now + (ttl > 0 ? ttl * 1000 : windowMs);
+
+  if (count > limit) {
+    return { success: false, remaining: 0, resetAt };
+  }
+
+  return { success: true, remaining: limit - count, resetAt };
+}
+
+function rateLimitMemory(
   key: string,
   limit: number,
   windowMs: number
@@ -39,9 +64,7 @@ export function rateLimit(
   const existing = buckets.get(key);
 
   if (!existing || existing.resetAt <= now) {
-    if (buckets.size >= MAX_TRACKED_KEYS) {
-      buckets.clear();
-    }
+    if (buckets.size >= MAX_TRACKED_KEYS) buckets.clear();
     buckets.set(key, { count: 1, resetAt: now + windowMs });
     return { success: true, remaining: limit - 1, resetAt: now + windowMs };
   }
@@ -58,6 +81,22 @@ export function rateLimit(
   };
 }
 
+/** @param key unique identifier, e.g. `login:${ip}` */
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number
+): Promise<RateLimitResult> {
+  if (redis) {
+    try {
+      return await rateLimitRedis(key, limit, windowMs);
+    } catch (err) {
+      console.error("[rate-limit] Redis failed, falling back to memory", err);
+    }
+  }
+  return rateLimitMemory(key, limit, windowMs);
+}
+
 /** Best-effort client identifier from standard proxy headers. */
 export function getClientIp(request: Request): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -65,4 +104,17 @@ export function getClientIp(request: Request): string {
   const realIp = request.headers.get("x-real-ip");
   if (realIp) return realIp;
   return "unknown";
+}
+
+/** Hash IP + resource for vote deduplication without storing raw IPs. */
+export async function hashVoterKey(
+  ip: string,
+  resourceId: string
+): Promise<string> {
+  const secret = process.env.AUTH_SECRET ?? "fallback-dev-secret";
+  const data = new TextEncoder().encode(`${secret}:${ip}:${resourceId}`);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }

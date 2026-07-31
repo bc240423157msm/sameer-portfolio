@@ -4,8 +4,8 @@ import {
   getBlogPosts,
   getPublishedBlogPosts,
   saveBlogPosts,
-  slugify,
 } from "@/lib/data";
+import { slugify } from "@/utils/slugify";
 import type { BlogPost } from "@/types/content";
 
 export async function GET(request: Request) {
@@ -33,13 +33,26 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { title, excerpt, content, category, published, coverImage } = body as {
+    const {
+      title,
+      excerpt,
+      content,
+      category,
+      published,
+      coverImage,
+      coverImageAlt,
+      focusKeyword,
+      slug: requestedSlug,
+    } = body as {
       title?: string;
       excerpt?: string;
       content?: string;
       category?: string;
       published?: boolean;
       coverImage?: string;
+      coverImageAlt?: string;
+      focusKeyword?: string;
+      slug?: string;
     };
 
     if (!title || !content) {
@@ -51,7 +64,7 @@ export async function POST(request: Request) {
 
     const posts = await getBlogPosts();
     const now = new Date().toISOString();
-    const baseSlug = slugify(title);
+    const baseSlug = requestedSlug ? slugify(requestedSlug) : slugify(title);
     let slug = baseSlug;
     let counter = 1;
     while (posts.some((p) => p.slug === slug)) {
@@ -69,6 +82,8 @@ export async function POST(request: Request) {
       createdAt: now,
       updatedAt: now,
       coverImage: coverImage || undefined,
+      coverImageAlt: coverImageAlt || title,
+      focusKeyword: focusKeyword || undefined,
     };
 
     posts.push(newPost);
@@ -102,7 +117,7 @@ export async function PUT(request: Request) {
     const existing = posts[index]!;
     const updated: BlogPost = {
       id: existing.id,
-      slug: updates.slug ?? existing.slug,
+      slug: updates.slug ? slugify(updates.slug) : existing.slug,
       title: updates.title ?? existing.title,
       excerpt: updates.excerpt ?? existing.excerpt,
       content: updates.content ?? existing.content,
@@ -112,6 +127,14 @@ export async function PUT(request: Request) {
       updatedAt: new Date().toISOString(),
       coverImage:
         updates.coverImage !== undefined ? updates.coverImage : existing.coverImage,
+      coverImageAlt:
+        updates.coverImageAlt !== undefined
+          ? updates.coverImageAlt
+          : existing.coverImageAlt,
+      focusKeyword:
+        updates.focusKeyword !== undefined
+          ? updates.focusKeyword
+          : existing.focusKeyword,
     };
     posts[index] = updated;
 

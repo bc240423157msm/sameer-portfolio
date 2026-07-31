@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import { Hero } from "@/components/sections/Hero";
 import { AboutIntro } from "@/components/sections/AboutIntro";
 import { Testimonials } from "@/components/sections/Testimonials";
+import { StatsSection } from "@/components/sections/StatsSection";
 import { CTASectionWrapper } from "@/components/sections/CTASectionWrapper";
 import { createPageMetadata } from "@/lib/seo";
 
@@ -36,6 +37,7 @@ export default function HomePage() {
     <>
       <Hero />
       <AboutIntro />
+      <StatsSection />
       <TechStack />
       <ServicesPreview />
       <FeaturedProjects />

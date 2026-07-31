@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/layout/Container";
 import { CommentSection } from "@/components/blog/CommentSection";
+import { BlogContent } from "@/components/blog/BlogContent";
+import { NewsletterSignup } from "@/components/common/NewsletterSignup";
+import { readingTimeMinutes } from "@/lib/blog-html";
 import { getBlogPostBySlug, getPublishedBlogPosts } from "@/lib/data";
 import { articleJsonLd, breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
+import { RelatedPosts } from "@/components/blog/RelatedPosts";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -31,17 +35,26 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     path: `/blog/${post.slug}`,
-    keywords: [post.category, "Web Development", "SEO"],
+    keywords: [post.category, post.focusKeyword, "Web Development", "SEO"].filter(
+      Boolean
+    ) as string[],
     type: "article",
     publishedTime: post.createdAt,
+    modifiedTime: post.updatedAt,
+    image: post.coverImage,
   });
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const [post, allPosts] = await Promise.all([
+    getBlogPostBySlug(slug),
+    getPublishedBlogPosts(),
+  ]);
 
   if (!post || !post.published) notFound();
+
+  const readTime = readingTimeMinutes(post.content);
 
   return (
     <article>
@@ -57,6 +70,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             description: post.excerpt,
             slug: post.slug,
             publishedAt: post.createdAt,
+            modifiedAt: post.updatedAt,
+            image: post.coverImage,
           }),
         ]}
       />
@@ -70,7 +85,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <ArrowLeft className="h-4 w-4" />
             Back to Blog
           </Link>
-          <div className="flex items-center gap-4 text-sm text-text-muted">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted">
             <span className="flex items-center gap-1">
               <Tag className="h-4 w-4" aria-hidden />
               {post.category}
@@ -86,6 +101,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 year: "numeric",
               })}
             </time>
+            <span className="flex items-center gap-1">
+              <Clock className="h-4 w-4" aria-hidden />
+              {readTime} min read
+            </span>
           </div>
           <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold text-text-primary sm:text-5xl">
             {post.title}
@@ -100,7 +119,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="relative h-64 w-full sm:h-96">
           <Image
             src={post.coverImage}
-            alt={post.title}
+            alt={post.coverImageAlt ?? post.title}
             fill
             priority
             sizes="100vw"
@@ -112,19 +131,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       <section className="py-16">
         <Container>
-          <div className="max-w-3xl">
-            {post.content.split("\n\n").map((paragraph) => (
-              <p
-                key={paragraph.slice(0, 50)}
-                className="mb-6 leading-relaxed text-text-secondary"
-              >
-                {paragraph}
-              </p>
-            ))}
+          <div className="grid gap-12 lg:grid-cols-[1fr_280px]">
+            <div className="max-w-3xl">
+              <BlogContent content={post.content} />
 
-            <div className="mt-16 border-t border-border/60 pt-10">
-              <CommentSection postSlug={post.slug} />
+              <RelatedPosts posts={allPosts} currentSlug={post.slug} />
+
+              <div className="mt-16 border-t border-border/60 pt-10">
+                <CommentSection postSlug={post.slug} />
+              </div>
             </div>
+
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <NewsletterSignup variant="sidebar" />
+              </div>
+            </aside>
           </div>
         </Container>
       </section>

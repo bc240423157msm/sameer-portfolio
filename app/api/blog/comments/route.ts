@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`comment:${ip}`, 8, 10 * 60 * 1000);
+    const limit = await rateLimit(`comment:${ip}`, 8, 10 * 60 * 1000);
     if (!limit.success) {
       return NextResponse.json(
         { error: "Too many comments. Please try again later." },

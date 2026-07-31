@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { success, error: toastError } = useToast();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,14 +33,18 @@ export function ContactForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Failed to send message");
+        const msg = data.error ?? "Failed to send message";
+        setError(msg);
+        toastError(msg);
         return;
       }
 
       setSubmitted(true);
+      success("Message sent! I'll get back to you within 24 hours.");
       form.reset();
     } catch {
       setError("Connection error. Please try again.");
+      toastError("Connection error. Please try again.");
     } finally {
       setLoading(false);
     }

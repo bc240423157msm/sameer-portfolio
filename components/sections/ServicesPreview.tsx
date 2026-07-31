@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { TiltCard } from "@/components/common/TiltCard";
 import { Container } from "@/components/layout/Container";
 import {
   MotionReveal,
@@ -30,6 +31,7 @@ export function ServicesPreview() {
             const Icon = service.icon;
             return (
               <StaggerItem key={service.title}>
+                <TiltCard className="h-full">
                 <div className="group flex h-full flex-col rounded-2xl border border-border/60 bg-card/40 p-8 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/70 hover:shadow-lg hover:shadow-primary/5">
                   <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
                     <Icon className="h-6 w-6" />
@@ -58,6 +60,7 @@ export function ServicesPreview() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>
+                </TiltCard>
               </StaggerItem>
             );
           })}

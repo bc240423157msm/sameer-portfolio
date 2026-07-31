@@ -24,16 +24,6 @@ export interface ServicePreview {
   href: string;
 }
 
-export interface ProjectPreview {
-  title: string;
-  subtitle: string;
-  description: string;
-  technologies: string[];
-  href: string;
-  /** Project screenshot/thumbnail. Currently a placeholder — swap for a real screenshot. */
-  image: string;
-}
-
 export interface WhyChooseItem {
   title: string;
   description: string;
@@ -116,48 +106,6 @@ export const servicePreviews: ServicePreview[] = [
     ],
     icon: Search,
     href: "/services",
-  },
-];
-
-export const featuredProjects: ProjectPreview[] = [
-  {
-    title: "Furniflair",
-    subtitle: "Luxury Furniture Website",
-    description:
-      "A modern furniture business website with clean UI, responsive design, and performance-focused development.",
-    technologies: ["React", "Tailwind CSS", "SEO"],
-    href: "/portfolio",
-    // PLACEHOLDER IMAGE — replace with a real screenshot of the Furniflair project.
-    // To use your own file: put it in /public/images/projects/furniflair.jpg
-    // and change this line to: image: "/images/projects/furniflair.jpg",
-    image:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=80&auto=format&fit=crop",
-  },
-  {
-    title: "AI WhatsApp Bot",
-    subtitle: "Virtual University Automation",
-    description:
-      "An intelligent WhatsApp system with human-like AI replies, group management, and automated study material sharing.",
-    technologies: ["Node.js", "AI", "WhatsApp API"],
-    href: "/portfolio",
-    // PLACEHOLDER IMAGE — replace with a real screenshot of the WhatsApp bot project.
-    // To use your own file: put it in /public/images/projects/whatsapp-bot.jpg
-    // and change this line to: image: "/images/projects/whatsapp-bot.jpg",
-    image:
-      "https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=900&q=80&auto=format&fit=crop",
-  },
-  {
-    title: "PascalineSoft",
-    subtitle: "Company Website",
-    description:
-      "A professional company website and responsive WordPress e-commerce build with custom layouts and UI improvements.",
-    technologies: ["WordPress", "WooCommerce", "PHP"],
-    href: "/portfolio",
-    // PLACEHOLDER IMAGE — replace with a real screenshot of the PascalineSoft project.
-    // To use your own file: put it in /public/images/projects/pascalinesoft.jpg
-    // and change this line to: image: "/images/projects/pascalinesoft.jpg",
-    image:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80&auto=format&fit=crop",
   },
 ];
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, MessageCircle, Send } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 import type { BlogComment } from "@/types/content";
 
 interface CommentSectionProps {
@@ -15,6 +16,7 @@ export function CommentSection({ postSlug }: CommentSectionProps) {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const { success, error: toastError } = useToast();
 
   useEffect(() => {
     let cancelled = false;
@@ -56,13 +58,16 @@ export function CommentSection({ postSlug }: CommentSectionProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong. Please try again.");
+        const msg = data.error ?? "Something went wrong. Please try again.";
+        setError(msg);
+        toastError(msg);
         return;
       }
 
       setComments((prev) => [data.comment, ...prev]);
       setName("");
       setMessage("");
+      success("Comment posted!");
     } catch {
       setError("Connection error. Please try again.");
     } finally {

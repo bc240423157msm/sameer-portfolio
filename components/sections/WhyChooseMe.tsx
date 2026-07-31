@@ -1,5 +1,6 @@
 "use client";
 
+import { TiltCard } from "@/components/common/TiltCard";
 import { Container } from "@/components/layout/Container";
 import {
   MotionReveal,
@@ -11,7 +12,7 @@ import { whyChooseItems } from "@/lib/content";
 
 export function WhyChooseMe() {
   return (
-    <section className="border-b border-border/60 py-24">
+    <section className="border-b border-border/60 bg-surface/50 py-24">
       <Container>
         <MotionReveal>
           <SectionHeading
@@ -28,7 +29,8 @@ export function WhyChooseMe() {
             const Icon = item.icon;
             return (
               <StaggerItem key={item.title}>
-                <div className="rounded-2xl border border-border/60 bg-card/40 p-6 backdrop-blur-sm transition-colors hover:border-primary/30 hover:bg-card/70">
+                <TiltCard className="h-full">
+                <div className="h-full rounded-2xl border border-border/60 bg-card/40 p-6 backdrop-blur-sm transition-colors hover:border-primary/30 hover:bg-card/70">
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
                     <Icon className="h-5 w-5" />
                   </div>
@@ -39,6 +41,7 @@ export function WhyChooseMe() {
                     {item.description}
                   </p>
                 </div>
+                </TiltCard>
               </StaggerItem>
             );
           })}

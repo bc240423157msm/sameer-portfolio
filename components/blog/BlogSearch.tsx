@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calendar, Search, Tag } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Search, Tag } from "lucide-react";
+import { TiltCard } from "@/components/common/TiltCard";
+import { readingTimeMinutes } from "@/lib/blog-html";
 import type { BlogPost } from "@/types/content";
 
 interface BlogSearchProps {
@@ -84,9 +86,9 @@ export function BlogSearch({ posts }: BlogSearchProps) {
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((post) => (
+            <TiltCard key={post.id} className="h-full">
             <article
-              key={post.id}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/40 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/40 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
             >
               <div className="relative h-40 w-full overflow-hidden">
                 {post.coverImage ? (
@@ -119,6 +121,10 @@ export function BlogSearch({ posts }: BlogSearchProps) {
                       year: "numeric",
                     })}
                   </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {readingTimeMinutes(post.content)} min
+                  </span>
                 </div>
                 <h2 className="mt-3 text-lg font-semibold text-text-primary group-hover:text-accent">
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
@@ -135,6 +141,7 @@ export function BlogSearch({ posts }: BlogSearchProps) {
                 </Link>
               </div>
             </article>
+            </TiltCard>
           ))}
         </div>
       )}

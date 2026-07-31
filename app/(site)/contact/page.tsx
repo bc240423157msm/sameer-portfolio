@@ -155,7 +155,7 @@ export default async function ContactPage() {
         </Container>
       </section>
 
-      <section className="border-t border-border/60 bg-surface/30 py-24">
+      <section className="border-t border-border/60 bg-surface/50 py-24">
         <Container>
           <SectionHeading
             eyebrow="FAQ"

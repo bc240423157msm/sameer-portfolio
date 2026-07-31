@@ -1,35 +1,25 @@
-import { promises as fs } from "fs";
-import path from "path";
 import type {
   BlogComment,
   BlogPost,
   ContactSubmission,
+  PendingTestimonial,
   SiteContent,
 } from "@/types/content";
 import { defaultBlogPosts, defaultSiteContent } from "@/lib/default-content";
+import { kvGet, kvSet } from "@/lib/kv";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const SITE_CONTENT_PATH = path.join(DATA_DIR, "site-content.json");
-const BLOG_POSTS_PATH = path.join(DATA_DIR, "blog-posts.json");
-const SUBMISSIONS_PATH = path.join(DATA_DIR, "contact-submissions.json");
-const COMMENTS_PATH = path.join(DATA_DIR, "blog-comments.json");
+const SITE_CONTENT_KEY = "site-content";
+const BLOG_POSTS_KEY = "blog-posts";
+const SUBMISSIONS_KEY = "contact-submissions";
+const COMMENTS_KEY = "blog-comments";
+const PAGES_KEY = "custom-pages";
+const MEDIA_KEY = "media-library";
+const PENDING_TESTIMONIALS_KEY = "pending-testimonials";
 
-async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-async function readJson<T>(filePath: string, fallback: T): Promise<T> {
-  try {
-    const raw = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-async function writeJson<T>(filePath: string, data: T): Promise<void> {
-  await ensureDataDir();
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+export interface MediaItem {
+  url: string;
+  uploadedAt: string;
+  usedIn: string[];
 }
 
 function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
@@ -73,20 +63,17 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
 }
 
 export async function getSiteContent(): Promise<SiteContent> {
-  const raw = await readJson<Partial<SiteContent> | null>(
-    SITE_CONTENT_PATH,
-    null
-  );
+  const raw = await kvGet<Partial<SiteContent> | null>(SITE_CONTENT_KEY, null);
   if (!raw) return defaultSiteContent;
   return mergeSiteContent(raw);
 }
 
 export async function saveSiteContent(content: SiteContent): Promise<void> {
-  await writeJson(SITE_CONTENT_PATH, content);
+  await kvSet(SITE_CONTENT_KEY, content);
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  return readJson(BLOG_POSTS_PATH, defaultBlogPosts);
+  return kvGet(BLOG_POSTS_KEY, defaultBlogPosts);
 }
 
 export async function getPublishedBlogPosts(): Promise<BlogPost[]> {
@@ -107,11 +94,11 @@ export async function getBlogPostBySlug(
 }
 
 export async function saveBlogPosts(posts: BlogPost[]): Promise<void> {
-  await writeJson(BLOG_POSTS_PATH, posts);
+  await kvSet(BLOG_POSTS_KEY, posts);
 }
 
 export async function getContactSubmissions(): Promise<ContactSubmission[]> {
-  const submissions = await readJson<ContactSubmission[]>(SUBMISSIONS_PATH, []);
+  const submissions = await kvGet<ContactSubmission[]>(SUBMISSIONS_KEY, []);
   return submissions.sort(
     (a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -129,7 +116,7 @@ export async function saveContactSubmission(
     read: false,
   };
   submissions.unshift(submission);
-  await writeJson(SUBMISSIONS_PATH, submissions);
+  await kvSet(SUBMISSIONS_KEY, submissions);
   return submission;
 }
 
@@ -138,21 +125,49 @@ export async function markSubmissionRead(id: string): Promise<void> {
   const index = submissions.findIndex((s) => s.id === id);
   if (index !== -1) {
     submissions[index]!.read = true;
-    await writeJson(SUBMISSIONS_PATH, submissions);
+    await kvSet(SUBMISSIONS_KEY, submissions);
   }
 }
 
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+export { slugify } from "@/utils/slugify";
+
+// ---- Client-submitted reviews awaiting admin approval ----
+
+export async function getPendingTestimonials(): Promise<PendingTestimonial[]> {
+  const items = await kvGet<PendingTestimonial[]>(PENDING_TESTIMONIALS_KEY, []);
+  return items.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+export async function savePendingTestimonial(
+  data: Omit<PendingTestimonial, "id" | "createdAt">
+): Promise<PendingTestimonial> {
+  const items = await getPendingTestimonials();
+  const item: PendingTestimonial = {
+    id: crypto.randomUUID(),
+    ...data,
+    createdAt: new Date().toISOString(),
+  };
+  items.unshift(item);
+  await kvSet(PENDING_TESTIMONIALS_KEY, items);
+  return item;
+}
+
+/** Removes a pending review — used both when rejecting it and right after
+ * approving it (it moves into the live `testimonials` list instead). */
+export async function removePendingTestimonial(id: string): Promise<void> {
+  const items = await getPendingTestimonials();
+  await kvSet(
+    PENDING_TESTIMONIALS_KEY,
+    items.filter((t) => t.id !== id)
+  );
 }
 
 export async function getCommentsForPost(
   postSlug: string
 ): Promise<BlogComment[]> {
-  const comments = await readJson<BlogComment[]>(COMMENTS_PATH, []);
+  const comments = await kvGet<BlogComment[]>(COMMENTS_KEY, []);
   return comments
     .filter((c) => c.postSlug === postSlug)
     .sort(
@@ -164,13 +179,63 @@ export async function getCommentsForPost(
 export async function saveComment(
   data: Omit<BlogComment, "id" | "createdAt">
 ): Promise<BlogComment> {
-  const comments = await readJson<BlogComment[]>(COMMENTS_PATH, []);
+  const comments = await kvGet<BlogComment[]>(COMMENTS_KEY, []);
   const comment: BlogComment = {
     id: crypto.randomUUID(),
     ...data,
     createdAt: new Date().toISOString(),
   };
   comments.unshift(comment);
-  await writeJson(COMMENTS_PATH, comments);
+  await kvSet(COMMENTS_KEY, comments);
   return comment;
+}
+
+// ---- Custom pages (admin-created pages from the dashboard) ----
+
+export async function getCustomPages() {
+  const { defaultCustomPages } = await import("@/lib/default-content");
+  return kvGet(PAGES_KEY, defaultCustomPages);
+}
+
+export async function saveCustomPages(
+  pages: Awaited<ReturnType<typeof getCustomPages>>
+): Promise<void> {
+  await kvSet(PAGES_KEY, pages);
+}
+
+// ---- Media library ----
+
+export async function getMediaLibrary(): Promise<MediaItem[]> {
+  return kvGet<MediaItem[]>(MEDIA_KEY, []);
+}
+
+export async function addMediaItem(
+  url: string,
+  usedIn?: string
+): Promise<MediaItem> {
+  const library = await getMediaLibrary();
+  const existing = library.find((m) => m.url === url);
+  if (existing) {
+    if (usedIn && !existing.usedIn.includes(usedIn)) {
+      existing.usedIn.push(usedIn);
+      await kvSet(MEDIA_KEY, library);
+    }
+    return existing;
+  }
+  const item: MediaItem = {
+    url,
+    uploadedAt: new Date().toISOString(),
+    usedIn: usedIn ? [usedIn] : [],
+  };
+  library.unshift(item);
+  await kvSet(MEDIA_KEY, library);
+  return item;
+}
+
+export async function removeMediaItem(url: string): Promise<void> {
+  const library = await getMediaLibrary();
+  await kvSet(
+    MEDIA_KEY,
+    library.filter((m) => m.url !== url)
+  );
 }

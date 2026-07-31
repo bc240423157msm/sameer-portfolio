@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   LogOut,
@@ -12,6 +12,12 @@ import {
   KeyRound,
 } from "lucide-react";
 import type { BlogPost } from "@/types/content";
+import {
+  BlogPostEditor,
+  blogPostToForm,
+  formToBlogPost,
+  type BlogPostFormData,
+} from "@/components/blog/BlogPostEditor";
 
 interface SeoDashboardProps {
   initialPosts: BlogPost[];
@@ -25,18 +31,40 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [accountForm, setAccountForm] = useState({
     currentPassword: "",
-    newUsername: "Support",
+    newUsername: "",
     newPassword: "",
   });
   const [accountMessage, setAccountMessage] = useState("");
   const [accountSaving, setAccountSaving] = useState(false);
-  const [newPost, setNewPost] = useState({
+  const emptyPostForm: BlogPostFormData = {
     title: "",
+    slug: "",
     excerpt: "",
     content: "",
     category: "SEO",
     published: true,
-  });
+    coverImage: "",
+    coverImageAlt: "",
+    focusKeyword: "",
+  };
+
+  const [newPost, setNewPost] = useState<BlogPostFormData>(emptyPostForm);
+  const [editingForm, setEditingForm] = useState<BlogPostFormData | null>(null);
+
+  async function refreshMe() {
+    const res = await fetch("/api/auth/me");
+    if (!res.ok) return;
+    const data = await res.json();
+    const username = data.user?.username as string | undefined;
+    if (username) {
+      setAccountForm((prev) => ({ ...prev, newUsername: username }));
+    }
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshMe();
+  }, []);
 
   async function changeAccount() {
     setAccountSaving(true);
@@ -73,29 +101,25 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
     if (res.ok) {
       const post = await res.json();
       setPosts((prev) => [post, ...prev]);
-      setNewPost({
-        title: "",
-        excerpt: "",
-        content: "",
-        category: "SEO",
-        published: true,
-      });
+      setNewPost(emptyPostForm);
       setMessage("Post published successfully!");
     }
     setSaving(false);
   }
 
-  async function updatePost(post: BlogPost) {
+  async function updatePost(post: BlogPost, form: BlogPostFormData) {
     setSaving(true);
+    const payload = { id: post.id, ...formToBlogPost(form, post) };
     const res = await fetch("/api/blog", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(post),
+      body: JSON.stringify(payload),
     });
     if (res.ok) {
       const updated = await res.json();
       setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
       setEditingPost(null);
+      setEditingForm(null);
       setMessage("Post updated!");
     }
     setSaving(false);
@@ -144,54 +168,24 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
             <Plus className="h-5 w-5 text-accent" />
             New Blog Post
           </h2>
-          <div className="space-y-4">
-            <input
-              placeholder="Post title (SEO-friendly)"
-              value={newPost.title}
-              onChange={(e) =>
-                setNewPost({ ...newPost, title: e.target.value })
-              }
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text-primary"
-            />
-            <input
-              placeholder="Category (e.g. SEO, Web Development)"
-              value={newPost.category}
-              onChange={(e) =>
-                setNewPost({ ...newPost, category: e.target.value })
-              }
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text-primary"
-            />
-            <textarea
-              placeholder="Meta description / excerpt"
-              value={newPost.excerpt}
-              onChange={(e) =>
-                setNewPost({ ...newPost, excerpt: e.target.value })
-              }
-              rows={2}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-text-primary"
-            />
-            <textarea
-              placeholder="Full post content"
-              value={newPost.content}
-              onChange={(e) =>
-                setNewPost({ ...newPost, content: e.target.value })
-              }
-              rows={8}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-text-primary"
-            />
-            <button
-              onClick={createPost}
-              disabled={saving}
-              className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white disabled:opacity-60"
-            >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <FileText className="h-4 w-4" />
-              )}
-              Publish Post
-            </button>
-          </div>
+          <BlogPostEditor
+            value={newPost}
+            onChange={setNewPost}
+            inputClass="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text-primary"
+            textareaClass="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-text-primary"
+          />
+          <button
+            onClick={createPost}
+            disabled={saving}
+            className="mt-4 flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white disabled:opacity-60"
+          >
+            {saving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
+            Publish Post
+          </button>
         </section>
 
         <section className="space-y-4">
@@ -206,49 +200,24 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
               key={post.id}
               className="rounded-xl border border-border bg-card p-5"
             >
-              {editingPost?.id === post.id ? (
+              {editingPost?.id === post.id && editingForm ? (
                 <div className="space-y-3">
-                  <input
-                    value={editingPost.title}
-                    onChange={(e) =>
-                      setEditingPost({
-                        ...editingPost,
-                        title: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text-primary"
-                  />
-                  <textarea
-                    value={editingPost.excerpt}
-                    onChange={(e) =>
-                      setEditingPost({
-                        ...editingPost,
-                        excerpt: e.target.value,
-                      })
-                    }
-                    rows={2}
-                    className="w-full rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text-primary"
-                  />
-                  <textarea
-                    value={editingPost.content}
-                    onChange={(e) =>
-                      setEditingPost({
-                        ...editingPost,
-                        content: e.target.value,
-                      })
-                    }
-                    rows={6}
-                    className="w-full rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text-primary"
+                  <BlogPostEditor
+                    value={editingForm}
+                    onChange={setEditingForm}
+                    postId={post.id}
+                    inputClass="w-full rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text-primary"
+                    textareaClass="w-full rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text-primary"
                   />
                   <div className="flex gap-2">
                     <button
-                      onClick={() => updatePost(editingPost)}
+                      onClick={() => updatePost(post, editingForm)}
                       className="rounded-lg bg-primary px-4 py-2 text-sm text-white"
                     >
                       Save Changes
                     </button>
                     <button
-                      onClick={() => setEditingPost(null)}
+                      onClick={() => { setEditingPost(null); setEditingForm(null); }}
                       className="rounded-lg border border-border px-4 py-2 text-sm text-text-secondary"
                     >
                       Cancel
@@ -272,7 +241,7 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button
-                      onClick={() => setEditingPost(post)}
+                      onClick={() => { setEditingPost(post); setEditingForm(blogPostToForm(post)); }}
                       className="rounded-lg border border-border p-2 text-text-secondary hover:text-text-primary"
                     >
                       <Edit3 className="h-4 w-4" />

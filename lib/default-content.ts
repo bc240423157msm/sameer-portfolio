@@ -8,20 +8,16 @@ import {
 } from "@/lib/copy";
 import { defaultBranding, defaultPageHeaders } from "@/lib/page-headers";
 
-// PLACEHOLDER IMAGES — replace each URL with a real project screenshot.
-// To use your own file: put it in /public/images/projects/<name>.jpg and
-// change the matching line below to e.g. "/images/projects/furniflair.jpg".
+// Real project screenshots live in /public. Case studies that don't have a
+// dedicated screenshot yet still fall back to a stock Unsplash image below —
+// drop the real file into /public and add it here to replace it.
 const caseStudyImages: Record<string, string> = {
   furniflair:
     "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80&auto=format&fit=crop",
-  "ai-whatsapp-bot":
-    "https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=1200&q=80&auto=format&fit=crop",
-  pascalinesoft:
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80&auto=format&fit=crop",
-  "pascalinesoft-uk":
-    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1200&q=80&auto=format&fit=crop",
-  "whatsapp-auto-chat":
-    "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=1200&q=80&auto=format&fit=crop",
+  "ai-whatsapp-bot": "/whatsapp_bot.webp",
+  pascalinesoft: "/pascalinesoft.webp",
+  "pascalinesoft-uk": "/pascalinesoft.webp",
+  "whatsapp-auto-chat": "/whatsappchatbot.webp",
   "ubqari-trust":
     "https://images.unsplash.com/photo-1593113646773-028c64a8f1b8?w=1200&q=80&auto=format&fit=crop",
   pureworkathletics:
@@ -48,6 +44,32 @@ export const defaultSiteContent: SiteContent = {
     contactEmail: "muhammad.sameer@pascalinesoft.com",
     calendlyUrl: "",
     branding: defaultBranding,
+    socialLinks: [
+      {
+        id: "social-github",
+        platform: "github",
+        label: "GitHub",
+        href: "https://github.com/sameermalik",
+      },
+      {
+        id: "social-linkedin",
+        platform: "linkedin",
+        label: "LinkedIn",
+        href: "https://linkedin.com/in/sameermalik",
+      },
+      {
+        id: "social-upwork",
+        platform: "upwork",
+        label: "Upwork",
+        href: "https://upwork.com/freelancers/~sameermalik",
+      },
+      {
+        id: "social-fiverr",
+        platform: "fiverr",
+        label: "Fiverr",
+        href: "https://fiverr.com/sameermalik",
+      },
+    ],
     pageHeaders: defaultPageHeaders,
   },
   about: aboutCopy,
@@ -77,6 +99,8 @@ export const defaultSiteContent: SiteContent = {
       "I design fast, modern websites, build custom WordPress solutions, develop WhatsApp bots, and deliver website redesigns that help businesses grow and automate workflows.",
   },
 };
+
+export const defaultCustomPages: import("@/types/content").CustomPage[] = [];
 
 export const defaultBlogPosts = [
   {

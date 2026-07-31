@@ -5,8 +5,9 @@ import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CTASectionWrapper } from "@/components/sections/CTASectionWrapper";
 import { BlogSearch } from "@/components/blog/BlogSearch";
+import { MotionReveal } from "@/components/common/MotionReveal";
 import { getPublishedBlogPosts } from "@/lib/data";
-import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, blogListingJsonLd, createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Blog",
@@ -24,10 +25,13 @@ export default async function BlogPage() {
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Blog", path: "/blog" },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Blog", path: "/blog" },
+          ]),
+          blogListingJsonLd(posts),
+        ]}
       />
       <PageHero
         variant="blog"
@@ -49,11 +53,13 @@ export default async function BlogPage() {
             </div>
           ) : (
             <>
-              <SectionHeading
-                eyebrow="Latest"
-                title="Recent articles"
-                description="Practical insights for business owners and developers."
-              />
+              <MotionReveal>
+                <SectionHeading
+                  eyebrow="Latest"
+                  title="Recent articles"
+                  description="Practical insights for business owners and developers."
+                />
+              </MotionReveal>
               <div className="mt-12">
                 <BlogSearch posts={posts} />
               </div>

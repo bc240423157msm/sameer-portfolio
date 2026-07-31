@@ -64,8 +64,8 @@ export default async function AboutPage() {
             <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm">
               <div className="relative h-44 w-full">
                 <Image
-                  src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&q=80&auto=format&fit=crop"
-                  alt="Developer workspace with code on screen"
+                  src="/about-details.webp"
+                  alt="Sameer Malik — development work in detail"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
@@ -94,7 +94,7 @@ export default async function AboutPage() {
         </Container>
       </section>
 
-      <section className="border-y border-border/60 bg-surface/30 py-24">
+      <section className="border-y border-border/60 bg-surface/50 py-24">
         <Container>
           <SectionHeading
             eyebrow="Skills"
@@ -137,7 +137,38 @@ export default async function AboutPage() {
         </Container>
       </section>
 
-      <section className="border-t border-border/60 bg-surface/30 py-24">
+      <section className="py-24">
+        <Container>
+          <SectionHeading
+            eyebrow="Behind the Scenes"
+            title="A few more moments"
+            align="center"
+            className="mx-auto"
+          />
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
+            {[
+              { src: "/sameermalik2.webp", alt: "Sameer Malik working" },
+              { src: "/hover_image_show.webp", alt: "Sameer Malik at his desk" },
+              { src: "/sameermalik7.webp", alt: "Sameer Malik — freelance developer" },
+            ].map((photo) => (
+              <div
+                key={photo.src}
+                className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-border/60 bg-card/40"
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                />
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-t border-border/60 bg-surface/50 py-24">
         <Container>
           <SectionHeading
             eyebrow="Process"

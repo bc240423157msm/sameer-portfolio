@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight, Code2, GraduationCap, Globe2 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { MotionReveal } from "@/components/common/MotionReveal";
@@ -30,7 +29,7 @@ const highlights = [
 
 export function AboutIntro() {
   return (
-    <section className="border-b border-border/60 py-24">
+    <section className="border-b border-border/60 bg-surface/50 py-24">
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-2">
           <MotionReveal

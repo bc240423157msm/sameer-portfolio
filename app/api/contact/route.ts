@@ -7,7 +7,7 @@ import { getClientIp, rateLimit } from "@/lib/rate-limit";
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`contact:${ip}`, 5, 10 * 60 * 1000);
+    const limit = await rateLimit(`contact:${ip}`, 5, 10 * 60 * 1000);
     if (!limit.success) {
       return NextResponse.json(
         { error: "Too many submissions. Please try again later." },

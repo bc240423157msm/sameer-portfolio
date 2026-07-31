@@ -13,7 +13,7 @@ import { technologies } from "@/lib/content";
 
 export function TechStack() {
   return (
-    <section className="border-b border-border/60 py-24">
+    <section className="border-b border-border/60 bg-surface/50 py-24">
       <Container>
         <MotionReveal>
           <SectionHeading
