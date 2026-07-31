@@ -381,3 +381,11 @@ export async function saveTotpSecret(username: string, secret: string) {
     }
   }
 }
+
+export async function getUserTotpSecret(username: string): Promise<string | null> {
+  const userRecord = await getUserRecord(username);
+  if (userRecord && userRecord.twoFactor?.totpSecret) {
+    return userRecord.twoFactor.totpSecret;
+  }
+  return null;
+}

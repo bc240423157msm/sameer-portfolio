@@ -11,7 +11,8 @@ import { verifyTotpCode } from "@/lib/totp";
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
-    const limit = rateLimit(`2fa:${ip}`, 10, 15 * 60 * 1000);
+    // Fixed: Added await keyword before rateLimit
+    const limit = await rateLimit(`2fa:${ip}`, 10, 15 * 60 * 1000);
     if (!limit.success) {
       return NextResponse.json(
         { error: "Too many attempts. Please try again later." },

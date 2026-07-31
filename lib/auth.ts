@@ -60,4 +60,34 @@ export async function getSession(): Promise<SessionUser | null> {
   return verifySession(token);
 }
 
+// ==========================================
+// 2FA Verification Helpers (Build Error Fix)
+// ==========================================
+
+export async function createPending2FAToken(user: SessionUser): Promise<string> {
+  return new SignJWT({ username: user.username, role: user.role, type: "2fa_pending" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("10m") // 10 mins window to enter 2FA code
+    .sign(getSecret());
+}
+
+export async function verifyPending2FAToken(
+  token: string
+): Promise<SessionUser | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSecret());
+    if (
+      payload.type === "2fa_pending" &&
+      typeof payload.username === "string" &&
+      (payload.role === "admin" || payload.role === "seo")
+    ) {
+      return { username: payload.username, role: payload.role };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export { COOKIE_NAME };
