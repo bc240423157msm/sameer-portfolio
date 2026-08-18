@@ -3,6 +3,11 @@
 import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
+import {
+  DEFAULT_LOGO,
+  isLocalPublicImage,
+  resolveImageSrc,
+} from "@/lib/image-src";
 
 interface ImageSpotlightProps {
   src: string;
@@ -35,12 +40,15 @@ export function ImageSpotlight({
   imageClassName,
   priority,
   onClick,
-  fallbackSrc = "/logo.webp",
+  fallbackSrc = DEFAULT_LOGO,
   interactive = true,
 }: ImageSpotlightProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const currentSrc = failedSrc === src ? fallbackSrc : src;
+  const normalizedSrc = resolveImageSrc(src, fallbackSrc);
+  const normalizedFallback = resolveImageSrc(fallbackSrc);
+  const currentSrc =
+    failedSrc === normalizedSrc ? normalizedFallback : normalizedSrc;
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -78,12 +86,13 @@ export function ImageSpotlight({
         height={!fill ? height : undefined}
         sizes={sizes}
         priority={priority}
+        unoptimized={isLocalPublicImage(currentSrc)}
         className={cn(
           "object-cover transition-[transform,filter] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/spotlight:scale-[1.03] group-hover/spotlight:brightness-110",
           imageClassName
         )}
         onError={() => {
-          if (currentSrc !== fallbackSrc) setFailedSrc(src);
+          if (currentSrc !== normalizedFallback) setFailedSrc(normalizedSrc);
         }}
       />
       {/* Spotlight glow border */}

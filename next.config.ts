@@ -10,6 +10,10 @@ const securityHeaders = [
     value: "strict-origin-when-cross-origin",
   },
   {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin",
+  },
+  {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
@@ -19,7 +23,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://translate.google.com https://translate.googleapis.com",
       "style-src 'self' 'unsafe-inline' https://www.gstatic.com https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://*.public.blob.vercel-storage.com https://www.gstatic.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://*.public.blob.vercel-storage.com https://*.blob.vercel-storage.com https://www.gstatic.com",
       "font-src 'self' data: https://www.gstatic.com",
       "connect-src 'self' https://www.google-analytics.com https://api.groq.com https://api.resend.com https://translate.googleapis.com",
       "frame-src https://translate.google.com https://translate.googleapis.com",
@@ -43,14 +47,21 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Next.js 16 requires local paths to be allowed explicitly.
+    localPatterns: [
+      { pathname: "/**" },
+      { pathname: "/uploads/**" },
+    ],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "*.public.blob.vercel-storage.com",
+        hostname: "**.public.blob.vercel-storage.com",
+        pathname: "/**",
       },
     ],
   },

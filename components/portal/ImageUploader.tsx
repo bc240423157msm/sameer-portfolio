@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, Trash2, RefreshCw } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { isLocalPublicImage, resolveImageSrc } from "@/lib/image-src";
 
 interface ImageUploaderProps {
   label?: string;

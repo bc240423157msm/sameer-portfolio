@@ -842,7 +842,7 @@ export function AdminDashboard({
                 </div>
               </div>
               <p className="text-xs text-text-muted">
-                "Load recommended list" replaces everything below with React.js, Next.js, TypeScript, Node.js, Tailwind CSS, WordPress, HTML5, CSS3, Figma, AI Video, Video Editing, Canva, Graphic Design, Git, GitHub in one click — remember to click Save after.
+                &ldquo;Load recommended list&rdquo; replaces everything below with React.js, Next.js, TypeScript, Node.js, Tailwind CSS, WordPress, HTML5, CSS3, Figma, AI Video, Video Editing, Canva, Graphic Design, Git, GitHub in one click — remember to click Save after.
               </p>
               <textarea value={content.home.techStack.description} onChange={(e) => setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, description: e.target.value } } })} rows={2} className={textareaClass} placeholder="Tech stack description" />
               <div className="grid gap-3 sm:grid-cols-2">
@@ -2019,7 +2019,7 @@ export function AdminDashboard({
                   placeholder="e.g. Y4snnMZUcOQAHqt3d7Q5..."
                 />
                 <p className="mt-1 text-xs text-text-muted">
-                  From search.google.com/search-console → Settings → Ownership verification → HTML tag → copy just the "content" value.
+                  From search.google.com/search-console → Settings → Ownership verification → HTML tag → copy just the &ldquo;content&rdquo; value.
                 </p>
               </div>
               <div>

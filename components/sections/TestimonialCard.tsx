@@ -143,7 +143,11 @@ export function TestimonialCard({ item, initialLikes, onLoveBurst }: Testimonial
 
   return (
     <blockquote className="relative flex flex-col rounded-2xl border border-border/60 bg-card/40 p-8 backdrop-blur-sm">
-      <div className="mb-4 flex gap-1" aria-label={`${item.rating} out of 5 stars`}>
+      <div
+        className="mb-4 flex gap-1"
+        role="img"
+        aria-label={`${item.rating} out of 5 stars`}
+      >
         {Array.from({ length: item.rating }).map((_, i) => (
           <Star key={i} className="h-4 w-4 fill-accent text-accent" aria-hidden />
         ))}

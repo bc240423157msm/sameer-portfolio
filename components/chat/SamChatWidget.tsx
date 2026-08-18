@@ -224,6 +224,10 @@ export function SamChatWidget() {
         )}
         style={{ height: isOpen ? "min(560px, calc(100vh - 7rem))" : 0 }}
         aria-hidden={!isOpen}
+        // `inert` (React 19) removes the closed panel from the tab order and
+        // the accessibility tree entirely, so its buttons/inputs can't be
+        // focused while hidden — aria-hidden alone doesn't prevent focus.
+        inert={!isOpen}
       >
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-border/60 bg-gradient-to-r from-primary/20 to-accent/10 px-4 py-3">

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { forwardRef } from "react";
+import { isLocalPublicImage, resolveImageSrc } from "@/lib/image-src";
 
 interface SpotlightRevealProps {
   src: string;
@@ -19,6 +20,8 @@ interface SpotlightRevealProps {
  */
 export const SpotlightReveal = forwardRef<HTMLDivElement, SpotlightRevealProps>(
   function SpotlightReveal({ src, alt, radius = 180 }, ref) {
+    const imageSrc = resolveImageSrc(src);
+
     return (
       <div
         ref={ref}
@@ -30,10 +33,11 @@ export const SpotlightReveal = forwardRef<HTMLDivElement, SpotlightRevealProps>(
         }}
       >
         <Image
-          src={src}
+          src={imageSrc}
           alt={alt}
           fill
           sizes="100vw"
+          unoptimized={isLocalPublicImage(imageSrc)}
           className="object-cover"
         />
       </div>

@@ -7,6 +7,7 @@ import { Camera } from "lucide-react";
 import { useEditMode } from "@/components/portal/AdminToolbar";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/utils/cn";
+import { isLocalPublicImage, resolveImageSrc } from "@/lib/image-src";
 
 // ImageUploader (drag-drop handling, upload API calls, preview UI) is only
 // ever needed by a logged-in admin who opens the picker — regular visitors
@@ -44,8 +45,10 @@ export function EditableImage({
 }: EditableImageProps) {
   const editMode = useEditMode();
   const { success, error } = useToast();
+  const resolvedSrc = resolveImageSrc(src, fallbackSrc);
+  const resolvedFallback = fallbackSrc ? resolveImageSrc(fallbackSrc) : undefined;
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(src || fallbackSrc || "");
+  const [currentSrc, setCurrentSrc] = useState(resolvedSrc || resolvedFallback || "");
   const [didFallback, setDidFallback] = useState(false);
   // Tracks the `src` this state was last synced to, so we can tell whether
   // the prop changed since the last render (see below).
@@ -60,7 +63,7 @@ export function EditableImage({
   // render pass — see https://react.dev/learn/you-might-not-need-an-effect
   if (src !== syncedSrc) {
     setSyncedSrc(src);
-    setCurrentSrc(src || fallbackSrc || "");
+    setCurrentSrc(resolvedSrc || resolvedFallback || "");
     setDidFallback(false);
   }
 
@@ -100,12 +103,13 @@ export function EditableImage({
           width={!fill ? width : undefined}
           height={!fill ? height : undefined}
           sizes={sizes}
+          unoptimized={isLocalPublicImage(currentSrc)}
           className="object-cover"
           data-cursor="view"
           onError={() => {
-            if (fallbackSrc && !didFallback) {
+            if (resolvedFallback && !didFallback) {
               setDidFallback(true);
-              setCurrentSrc(fallbackSrc);
+              setCurrentSrc(resolvedFallback);
             } else {
               setCurrentSrc("");
             }

@@ -8,6 +8,11 @@ import { Container } from "@/components/layout/Container";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import type { NavLink } from "@/types";
 import { navLinks as defaultNavLinks } from "@/lib/site-config";
+import {
+  DEFAULT_LOGO,
+  isLocalPublicImage,
+  resolveImageSrc,
+} from "@/lib/image-src";
 import { cn } from "@/utils/cn";
 
 interface NavbarProps {
@@ -135,6 +140,15 @@ export function Navbar({
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(alwaysVisible);
+  const [currentLogoSrc, setCurrentLogoSrc] = useState(() =>
+    resolveImageSrc(logoSrc, DEFAULT_LOGO)
+  );
+  const [syncedLogoSrc, setSyncedLogoSrc] = useState(logoSrc);
+
+  if (logoSrc !== syncedLogoSrc) {
+    setSyncedLogoSrc(logoSrc);
+    setCurrentLogoSrc(resolveImageSrc(logoSrc, DEFAULT_LOGO));
+  }
 
   const allLinks = [...navLinks, ...extraNavLinks];
 
@@ -170,13 +184,19 @@ export function Navbar({
             aria-label="Go to homepage"
           >
             <Image
-              src={logoSrc}
+              src={currentLogoSrc}
               alt={logoAlt}
               width={220}
               height={54}
               priority
+              unoptimized={isLocalPublicImage(currentLogoSrc)}
               style={{ width: logoWidth, height: "auto", maxWidth: "min(50vw, 320px)" }}
               className="object-contain object-left"
+              onError={() => {
+                if (currentLogoSrc !== DEFAULT_LOGO) {
+                  setCurrentLogoSrc(DEFAULT_LOGO);
+                }
+              }}
             />
           </Link>
 

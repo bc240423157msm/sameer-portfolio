@@ -70,6 +70,7 @@ export function ServicesPreviewClient({
 
                   <Link
                     href={service.href}
+                    aria-label={`Learn more about ${service.title}`}
                     className={cn(
                       "mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:text-primary"
                     )}

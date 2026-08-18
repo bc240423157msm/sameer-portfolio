@@ -7,6 +7,7 @@ import type {
   SiteContent,
 } from "@/types/content";
 import { defaultBlogPosts, defaultSiteContent } from "@/lib/default-content";
+import { resolveImageSrc, resolveOptionalImageSrc } from "@/lib/image-src";
 import { kvGet, kvSet } from "@/lib/kv";
 
 const SITE_CONTENT_KEY = "site-content";
@@ -50,6 +51,10 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
       branding: {
         ...defaultSiteContent.settings.branding,
         ...settings.branding,
+        logoSrc: resolveImageSrc(
+          settings.branding?.logoSrc,
+          defaultSiteContent.settings.branding.logoSrc
+        ),
       },
       seo: {
         ...defaultSiteContent.settings.seo,
@@ -73,6 +78,10 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
             {
               ...defaultSiteContent.settings.pageHeaders[key],
               ...(settings.pageHeaders?.[key] ?? {}),
+              src: resolveImageSrc(
+                settings.pageHeaders?.[key]?.src,
+                defaultSiteContent.settings.pageHeaders[key].src
+              ),
             },
           ])
         ),
@@ -105,9 +114,21 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
       detailsImage: {
         ...defaultSiteContent.about.detailsImage,
         ...partial.about?.detailsImage,
+        src: resolveImageSrc(
+          partial.about?.detailsImage?.src,
+          defaultSiteContent.about.detailsImage.src
+        ),
       },
-      galleryPhotos:
-        partial.about?.galleryPhotos ?? defaultSiteContent.about.galleryPhotos,
+      galleryPhotos: (
+        partial.about?.galleryPhotos ?? defaultSiteContent.about.galleryPhotos
+      ).map((photo, index) => {
+        const fallback =
+          defaultSiteContent.about.galleryPhotos[index]?.src ?? photo.src;
+        return {
+          ...photo,
+          src: resolveImageSrc(photo.src, fallback),
+        };
+      }),
     },
     services: partial.services ?? defaultSiteContent.services,
     whyWorkWithMe: partial.whyWorkWithMe ?? defaultSiteContent.whyWorkWithMe,
@@ -125,9 +146,23 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
         ...partial.contactPage?.faq,
       },
     },
-    portfolio: partial.portfolio ?? defaultSiteContent.portfolio,
+    portfolio: (partial.portfolio ?? defaultSiteContent.portfolio).map(
+      (project, index) => {
+        const fallback =
+          defaultSiteContent.portfolio[index]?.image ?? project.image;
+        return {
+          ...project,
+          image: resolveImageSrc(project.image, fallback),
+        };
+      }
+    ),
     faq: partial.faq ?? defaultSiteContent.faq,
-    testimonials: partial.testimonials ?? defaultSiteContent.testimonials,
+    testimonials: (partial.testimonials ?? defaultSiteContent.testimonials).map(
+      (item) => ({
+        ...item,
+        image: resolveOptionalImageSrc(item.image),
+      })
+    ),
     hero: { ...defaultSiteContent.hero, ...partial.hero },
     home: {
       ...defaultSiteContent.home,
@@ -164,14 +199,26 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
         mainPhoto: {
           ...defaultSiteContent.home.aboutIntro.mainPhoto,
           ...partial.home?.aboutIntro?.mainPhoto,
+          src: resolveImageSrc(
+            partial.home?.aboutIntro?.mainPhoto?.src,
+            defaultSiteContent.home.aboutIntro.mainPhoto.src
+          ),
         },
         accentPhoto1: {
           ...defaultSiteContent.home.aboutIntro.accentPhoto1,
           ...partial.home?.aboutIntro?.accentPhoto1,
+          src: resolveImageSrc(
+            partial.home?.aboutIntro?.accentPhoto1?.src,
+            defaultSiteContent.home.aboutIntro.accentPhoto1.src
+          ),
         },
         accentPhoto2: {
           ...defaultSiteContent.home.aboutIntro.accentPhoto2,
           ...partial.home?.aboutIntro?.accentPhoto2,
+          src: resolveImageSrc(
+            partial.home?.aboutIntro?.accentPhoto2?.src,
+            defaultSiteContent.home.aboutIntro.accentPhoto2.src
+          ),
         },
       },
       cta: { ...defaultSiteContent.home.cta, ...partial.home?.cta },
@@ -198,7 +245,11 @@ export async function saveSiteContent(content: SiteContent): Promise<void> {
 }
 
 export const getBlogPosts = cache(async (): Promise<BlogPost[]> => {
-  return kvGet(BLOG_POSTS_KEY, defaultBlogPosts);
+  const posts = await kvGet(BLOG_POSTS_KEY, defaultBlogPosts);
+  return posts.map((post) => ({
+    ...post,
+    coverImage: resolveOptionalImageSrc(post.coverImage),
+  }));
 });
 
 export async function getPublishedBlogPosts(): Promise<BlogPost[]> {

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Container } from "@/components/layout/Container";
 import type { HeaderImage } from "@/lib/page-headers";
+import { isLocalPublicImage, resolveImageSrc } from "@/lib/image-src";
 import { cn } from "@/utils/cn";
 
 export interface PageHeroViewProps {
@@ -20,6 +21,8 @@ export function PageHeroView({
   className,
   priority = false,
 }: PageHeroViewProps) {
+  const heroSrc = resolveImageSrc(image.src);
+
   return (
     <section
       className={cn(
@@ -29,12 +32,13 @@ export function PageHeroView({
       aria-label={title}
     >
       <Image
-        src={image.src}
+        src={heroSrc}
         alt={image.alt}
         fill
         priority={priority}
         loading={priority ? undefined : "lazy"}
         quality={80}
+        unoptimized={isLocalPublicImage(heroSrc)}
         className="object-cover object-center scale-105"
         sizes="100vw"
       />
