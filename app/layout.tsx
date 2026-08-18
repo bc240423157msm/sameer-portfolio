@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@fontsource-variable/inter/standard.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -150,6 +152,8 @@ export default async function RootLayout({
           data={[personJsonLd(), websiteJsonLd(), professionalServiceJsonLd()]}
         />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -94,7 +94,12 @@ export function EditableImage({
   );
 
   return (
-    <div className={cn("relative", className)}>
+    <div
+      className={cn(
+        fill ? "absolute inset-0" : "relative inline-block",
+        className
+      )}
+    >
       {currentSrc ? (
         <Image
           src={currentSrc}
