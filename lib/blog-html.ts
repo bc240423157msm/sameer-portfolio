@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 const ALLOWED_TAGS = [
   "p",
@@ -50,10 +50,15 @@ function escapeHtml(text: string): string {
 /** Sanitize admin-authored HTML before rendering on the public site. */
 export function sanitizeBlogHtml(html: string): string {
   const normalized = plainTextToHtml(html);
-  return DOMPurify.sanitize(normalized, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ADD_ATTR: ["target"],
+  return sanitizeHtml(normalized, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: {
+      "*": ALLOWED_ATTR,
+    },
+    // Keep external links safe regardless of what the editor sent.
+    transformTags: {
+      a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }, true),
+    },
   });
 }
 
