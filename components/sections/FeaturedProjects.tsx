@@ -26,9 +26,9 @@ export async function FeaturedProjects() {
         </MotionReveal>
 
         <StaggerContainer className="mt-16 grid gap-6 md:grid-cols-3">
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <StaggerItem key={project.slug}>
-              <FeaturedProjectCard project={project} />
+              <FeaturedProjectCard project={project} projectIndex={index} />
             </StaggerItem>
           ))}
         </StaggerContainer>

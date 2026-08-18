@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/common/PageHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/layout/Container";
+import { getSiteContent } from "@/lib/data";
 import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -12,7 +13,8 @@ export const metadata: Metadata = createPageMetadata({
   keywords: ["Terms of Service"],
 });
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const content = await getSiteContent();
   return (
     <>
       <JsonLd
@@ -23,8 +25,8 @@ export default function TermsPage() {
       />
       <PageHero
         variant="legal"
-        title="Terms of Service"
-        description="The terms that apply when working with me on a web development or automation project."
+        title={content.settings.pageHeroText.terms.title}
+        description={content.settings.pageHeroText.terms.description}
       />
 
       <section className="py-24">

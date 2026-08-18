@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ImageSpotlight } from "@/components/common/ImageSpotlight";
 import { ImageLightbox } from "@/components/common/ImageLightbox";
 import type { SiteContent } from "@/types/content";
@@ -33,6 +33,7 @@ export function PortfolioImage({
           src={project.image}
           alt={`${project.title} — ${project.subtitle}`}
           sizes="100vw"
+          fallbackSrc="/work.webp"
           onClick={() => {
             setLightboxIndex(projectIndex);
             setLightboxOpen(true);

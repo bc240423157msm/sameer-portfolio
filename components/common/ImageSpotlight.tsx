@@ -1,7 +1,7 @@
 "use client";
 
-import Image, { type ImageProps } from "next/image";
-import { useCallback, useRef } from "react";
+import Image from "next/image";
+import { useCallback, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 
 interface ImageSpotlightProps {
@@ -15,6 +15,7 @@ interface ImageSpotlightProps {
   imageClassName?: string;
   priority?: boolean;
   onClick?: () => void;
+  fallbackSrc?: string;
   /** Adds data-cursor="view" for custom cursor */
   interactive?: boolean;
 }
@@ -34,9 +35,12 @@ export function ImageSpotlight({
   imageClassName,
   priority,
   onClick,
+  fallbackSrc = "/logo.webp",
   interactive = true,
 }: ImageSpotlightProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const currentSrc = failedSrc === src ? fallbackSrc : src;
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -67,7 +71,7 @@ export function ImageSpotlight({
       onClick={onClick}
     >
       <Image
-        src={src}
+        src={currentSrc}
         alt={alt}
         fill={fill}
         width={!fill ? width : undefined}
@@ -78,6 +82,9 @@ export function ImageSpotlight({
           "object-cover transition-[transform,filter] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/spotlight:scale-[1.03] group-hover/spotlight:brightness-110",
           imageClassName
         )}
+        onError={() => {
+          if (currentSrc !== fallbackSrc) setFailedSrc(src);
+        }}
       />
       {/* Spotlight glow border */}
       <div

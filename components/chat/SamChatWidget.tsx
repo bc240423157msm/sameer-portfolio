@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   Bot,
@@ -278,9 +279,12 @@ export function SamChatWidget() {
                   </p>
                 )}
                 {msg.attachment?.type === "image" && (
-                  <img
+                  <Image
                     src={msg.attachment.dataUrl}
                     alt={msg.attachment.name}
+                    width={240}
+                    height={160}
+                    unoptimized
                     className="mb-2 max-h-40 rounded-lg object-cover"
                   />
                 )}
@@ -324,9 +328,12 @@ export function SamChatWidget() {
           <div className="border-t border-border/40 bg-surface/50 px-4 py-2">
             <div className="flex items-center gap-2">
               {pendingFile.type.startsWith("image/") ? (
-                <img
+                <Image
                   src={pendingPreview}
                   alt="Preview"
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="h-12 w-12 rounded-lg object-cover"
                 />
               ) : (

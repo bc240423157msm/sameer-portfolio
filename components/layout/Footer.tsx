@@ -4,13 +4,22 @@ import { BackToTopButton } from "@/components/common/BackToTopButton";
 import { NewsletterSignup } from "@/components/common/NewsletterSignup";
 import { SocialIcon } from "@/components/common/SocialIcon";
 import { footerLinks, navLinks, siteConfig } from "@/lib/site-config";
+import type { NavLink } from "@/types";
 import type { SocialLink } from "@/types/content";
 
 interface FooterProps {
   socialLinks?: SocialLink[];
+  navLinks?: NavLink[];
+  footerLinks?: NavLink[];
+  description?: string;
 }
 
-export function Footer({ socialLinks = [] }: FooterProps) {
+export function Footer({
+  socialLinks = [],
+  navLinks: footerNavLinks = navLinks,
+  footerLinks: legalLinks = footerLinks,
+  description = "Full Stack Web Developer & AI Automation Specialist building fast, SEO-friendly websites and intelligent automation for businesses worldwide.",
+}: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -25,9 +34,7 @@ export function Footer({ socialLinks = [] }: FooterProps) {
               {siteConfig.name}
             </Link>
             <p className="mt-3 max-w-sm text-sm text-text-secondary">
-              Full Stack Web Developer & AI Automation Specialist building
-              fast, SEO-friendly websites and intelligent automation for
-              businesses worldwide.
+              {description}
             </p>
             <NewsletterSignup />
           </div>
@@ -35,7 +42,7 @@ export function Footer({ socialLinks = [] }: FooterProps) {
           <nav aria-label="Footer navigation">
             <p className="text-sm font-medium text-text-primary">Quick Links</p>
             <ul className="mt-4 space-y-2.5">
-              {navLinks.map((link) => (
+              {footerNavLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -77,7 +84,7 @@ export function Footer({ socialLinks = [] }: FooterProps) {
           </p>
 
           <div className="flex items-center gap-6">
-            {footerLinks.map((link) => (
+            {legalLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

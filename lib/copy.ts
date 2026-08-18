@@ -48,6 +48,7 @@ export const servicesCopy = [
       "Performance Optimization",
     ],
     technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Node.js"],
+    iconKey: "globe",
   },
   {
     id: "ai-automation",
@@ -62,6 +63,7 @@ export const servicesCopy = [
       "Business Process Automation",
     ],
     technologies: ["Node.js", "OpenAI API", "WhatsApp API", "REST APIs"],
+    iconKey: "bot",
   },
   {
     id: "wordpress",
@@ -78,6 +80,7 @@ export const servicesCopy = [
       "Ongoing Maintenance",
     ],
     technologies: ["WordPress", "WooCommerce", "PHP", "MySQL"],
+    iconKey: "shopping-cart",
   },
   {
     id: "figma-design",
@@ -92,6 +95,7 @@ export const servicesCopy = [
       "Handoff-Ready Files for Developers",
     ],
     technologies: ["Figma", "UI/UX Design", "Prototyping"],
+    iconKey: "pen-tool",
   },
   {
     id: "social-media-marketing",
@@ -106,6 +110,7 @@ export const servicesCopy = [
       "Performance Reporting",
     ],
     technologies: ["Meta Ads", "Instagram", "Facebook", "Content Strategy"],
+    iconKey: "trending-up",
   },
   {
     id: "seo",
@@ -120,6 +125,7 @@ export const servicesCopy = [
       "Analytics & Search Console Setup",
     ],
     technologies: ["Google Search Console", "Google Analytics", "Technical SEO"],
+    iconKey: "search",
   },
 ];
 

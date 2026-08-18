@@ -7,15 +7,20 @@ import { useEffect, useRef, useState } from "react";
 import { Container } from "@/components/layout/Container";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import type { NavLink } from "@/types";
-import { navLinks } from "@/lib/site-config";
+import { navLinks as defaultNavLinks } from "@/lib/site-config";
 import { cn } from "@/utils/cn";
 
 interface NavbarProps {
   logoSrc: string;
   logoAlt: string;
   logoWidth?: number;
+  navLinks?: NavLink[];
   extraNavLinks?: NavLink[];
   isAdmin?: boolean;
+  /** Keep the navbar visible immediately on load, instead of only
+   * revealing it once the user scrolls down. Used on pages (like the
+   * portal login) where there may be no scrollable content at all. */
+  alwaysVisible?: boolean;
 }
 
 interface PortalUser {
@@ -80,9 +85,12 @@ function ProfileBadge() {
         aria-expanded={menuOpen}
       >
         {user.avatarUrl ? (
-          <img
+          <Image
             src={user.avatarUrl}
             alt={user.username}
+            width={28}
+            height={28}
+            unoptimized
             className="h-7 w-7 rounded-full object-cover"
           />
         ) : (
@@ -119,13 +127,24 @@ export function Navbar({
   logoSrc,
   logoAlt,
   logoWidth = 104,
+  navLinks = defaultNavLinks,
   extraNavLinks = [],
   isAdmin = false,
+  alwaysVisible = false,
 }: NavbarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(alwaysVisible);
 
   const allLinks = [...navLinks, ...extraNavLinks];
+
+  useEffect(() => {
+    if (alwaysVisible) return;
+    const onScroll = () => setHasScrolled(window.scrollY > 56);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [alwaysVisible]);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -133,8 +152,13 @@ export function Navbar({
   return (
     <header
       className={cn(
-        "sticky z-50 border-b border-border bg-background/90 backdrop-blur-md",
-        isAdmin ? "top-10" : "top-0"
+        "fixed inset-x-0 z-50 border-b border-border bg-background/90 shadow-lg shadow-black/5 backdrop-blur-md transition-transform duration-300 ease-out",
+        isAdmin ? "top-10" : "top-0",
+        hasScrolled || isOpen || alwaysVisible
+          ? "translate-y-0"
+          : isAdmin
+            ? "-translate-y-[calc(100%+2.5rem)]"
+            : "-translate-y-full"
       )}
     >
       <Container>

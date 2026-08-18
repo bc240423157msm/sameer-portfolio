@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/common/PageHero";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/layout/Container";
+import { getSiteContent } from "@/lib/data";
 import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -12,7 +13,8 @@ export const metadata: Metadata = createPageMetadata({
   keywords: ["Privacy Policy"],
 });
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const content = await getSiteContent();
   return (
     <>
       <JsonLd
@@ -23,8 +25,8 @@ export default function PrivacyPolicyPage() {
       />
       <PageHero
         variant="legal"
-        title="Privacy Policy"
-        description="How information submitted through this website is collected, used, and protected."
+        title={content.settings.pageHeroText["privacy-policy"].title}
+        description={content.settings.pageHeroText["privacy-policy"].description}
       />
 
       <section className="py-24">

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import { SetupChecklist } from "@/components/portal/SetupChecklist";
 import { useRouter } from "next/navigation";
 import {
   LogOut,
@@ -27,9 +29,13 @@ import {
 import type { BlogPost, ContactSubmission, SiteContent, Testimonial, SocialLink } from "@/types/content";
 import {
   pageHeaderLabels,
+  pageHeroTextLabels,
   type PageHeaderKey,
+  type PageHeroTextKey,
 } from "@/lib/page-headers";
 import { ImageUploader } from "@/components/portal/ImageUploader";
+import { TechIconUploader } from "@/components/portal/TechIconUploader";
+import { ICON_OPTIONS } from "@/lib/icon-registry";
 import {
   BlogPostEditor,
   blogPostToForm,
@@ -337,7 +343,7 @@ export function AdminDashboard({
   const [editingForm, setEditingForm] = useState<BlogPostFormData | null>(null);
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: "hero", label: "Home Hero", icon: Home },
+    { id: "hero", label: "Home Page", icon: Home },
     { id: "about", label: "About", icon: Layout },
     { id: "portfolio", label: "Portfolio", icon: Briefcase },
     { id: "faq", label: "FAQ", icon: HelpCircle },
@@ -354,7 +360,7 @@ export function AdminDashboard({
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/portal");
+    router.push("/");
     router.refresh();
   }
 
@@ -519,6 +525,8 @@ export function AdminDashboard({
         </div>
       </header>
 
+      <SetupChecklist />
+
       <div className="mx-auto flex max-w-7xl gap-8 px-6 py-8">
         <aside className="hidden w-56 shrink-0 lg:block">
           <nav className="sticky top-24 space-y-1">
@@ -565,13 +573,533 @@ export function AdminDashboard({
           )}
 
         {tab === "hero" && (
-          <div className="space-y-4 rounded-xl border border-border bg-card p-6">
-            <h2 className="font-semibold text-text-primary">Home Page Hero</h2>
-            <input value={content.hero.tagline} onChange={(e) => setContent({ ...content, hero: { ...content.hero, tagline: e.target.value } })} className={inputClass} placeholder="Tagline" />
-            <input value={content.hero.headline} onChange={(e) => setContent({ ...content, hero: { ...content.hero, headline: e.target.value } })} className={inputClass} placeholder="Headline" />
-            <textarea value={content.hero.description} onChange={(e) => setContent({ ...content, hero: { ...content.hero, description: e.target.value } })} rows={4} className={textareaClass} placeholder="Description" />
+          <div className="space-y-4">
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <h2 className="font-semibold text-text-primary">Home Page Hero</h2>
+              <input value={content.hero.tagline} onChange={(e) => setContent({ ...content, hero: { ...content.hero, tagline: e.target.value } })} className={inputClass} placeholder="Tagline" />
+              <input value={content.hero.headline} onChange={(e) => setContent({ ...content, hero: { ...content.hero, headline: e.target.value } })} className={inputClass} placeholder="Headline" />
+              <textarea value={content.hero.description} onChange={(e) => setContent({ ...content, hero: { ...content.hero, description: e.target.value } })} rows={4} className={textareaClass} placeholder="Description" />
+            </section>
+
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">Home Stats</h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      home: {
+                        ...content.home,
+                        stats: [
+                          ...content.home.stats,
+                          { id: crypto.randomUUID(), value: 0, suffix: "+", label: "New Stat" },
+                        ],
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add stat
+                </button>
+              </div>
+              <div className="grid gap-3">
+                {content.home.stats.map((stat, i) => (
+                  <div key={stat.id} className="grid gap-3 rounded-lg border border-border bg-surface p-4 sm:grid-cols-[120px_90px_1fr_auto]">
+                    <input
+                      type="number"
+                      value={stat.value}
+                      onChange={(e) => {
+                        const stats = [...content.home.stats];
+                        stats[i] = { ...stats[i]!, value: Number(e.target.value) };
+                        setContent({ ...content, home: { ...content.home, stats } });
+                      }}
+                      className={inputClass}
+                      placeholder="Value"
+                    />
+                    <input
+                      value={stat.suffix}
+                      onChange={(e) => {
+                        const stats = [...content.home.stats];
+                        stats[i] = { ...stats[i]!, suffix: e.target.value };
+                        setContent({ ...content, home: { ...content.home, stats } });
+                      }}
+                      className={inputClass}
+                      placeholder="+"
+                    />
+                    <input
+                      value={stat.label}
+                      onChange={(e) => {
+                        const stats = [...content.home.stats];
+                        stats[i] = { ...stats[i]!, label: e.target.value };
+                        setContent({ ...content, home: { ...content.home, stats } });
+                      }}
+                      className={inputClass}
+                      placeholder="Happy Clients"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setContent({
+                          ...content,
+                          home: {
+                            ...content.home,
+                            stats: content.home.stats.filter((_, idx) => idx !== i),
+                          },
+                        })
+                      }
+                      className="rounded-lg border border-border p-2 text-error"
+                      aria-label="Remove stat"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <h2 className="font-semibold text-text-primary">Home Section Text</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <input value={content.home.aboutIntro.eyebrow} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, eyebrow: e.target.value } } })} className={inputClass} placeholder="About eyebrow" />
+                <input value={content.home.aboutIntro.title} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, title: e.target.value } } })} className={inputClass} placeholder="About title" />
+                <input value={content.home.techStack.title} onChange={(e) => setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, title: e.target.value } } })} className={inputClass} placeholder="Tech title" />
+                <input value={content.home.servicesPreview.title} onChange={(e) => setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, title: e.target.value } } })} className={inputClass} placeholder="Services title" />
+                <input value={content.home.whyChooseMe.title} onChange={(e) => setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, title: e.target.value } } })} className={inputClass} placeholder="Why choose title" />
+                <input value={content.home.cta.title} onChange={(e) => setContent({ ...content, home: { ...content.home, cta: { ...content.home.cta, title: e.target.value } } })} className={inputClass} placeholder="CTA title" />
+              </div>
+              <textarea value={content.home.cta.description} onChange={(e) => setContent({ ...content, home: { ...content.home, cta: { ...content.home.cta, description: e.target.value } } })} rows={3} className={textareaClass} placeholder="CTA description" />
+            </section>
+
+            {/* ===== About Intro (full) ===== */}
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <h2 className="font-semibold text-text-primary">About Intro Section</h2>
+              <textarea value={content.home.aboutIntro.paragraph1} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, paragraph1: e.target.value } } })} rows={3} className={textareaClass} placeholder="Paragraph 1" />
+              <textarea value={content.home.aboutIntro.paragraph2} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, paragraph2: e.target.value } } })} rows={3} className={textareaClass} placeholder="Paragraph 2" />
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <ImageUploader
+                    label="Main photo"
+                    value={content.home.aboutIntro.mainPhoto.src}
+                    onChange={(url) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, mainPhoto: { ...content.home.aboutIntro.mainPhoto, src: url } } } })}
+                    aspect="aspect-[4/5]"
+                  />
+                  <input value={content.home.aboutIntro.mainPhoto.alt} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, mainPhoto: { ...content.home.aboutIntro.mainPhoto, alt: e.target.value } } } })} className={inputClass} placeholder="Main photo alt" />
+                </div>
+                <div className="space-y-2">
+                  <ImageUploader
+                    label="Accent photo 1"
+                    value={content.home.aboutIntro.accentPhoto1.src}
+                    onChange={(url) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, accentPhoto1: { ...content.home.aboutIntro.accentPhoto1, src: url } } } })}
+                    aspect="aspect-square"
+                  />
+                  <input value={content.home.aboutIntro.accentPhoto1.alt} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, accentPhoto1: { ...content.home.aboutIntro.accentPhoto1, alt: e.target.value } } } })} className={inputClass} placeholder="Accent 1 alt" />
+                </div>
+                <div className="space-y-2">
+                  <ImageUploader
+                    label="Accent photo 2"
+                    value={content.home.aboutIntro.accentPhoto2.src}
+                    onChange={(url) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, accentPhoto2: { ...content.home.aboutIntro.accentPhoto2, src: url } } } })}
+                    aspect="aspect-square"
+                  />
+                  <input value={content.home.aboutIntro.accentPhoto2.alt} onChange={(e) => setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, accentPhoto2: { ...content.home.aboutIntro.accentPhoto2, alt: e.target.value } } } })} className={inputClass} placeholder="Accent 2 alt" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-2">
+                <h3 className="text-sm font-medium text-text-primary">Highlights</h3>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      home: {
+                        ...content.home,
+                        aboutIntro: {
+                          ...content.home.aboutIntro,
+                          highlights: [
+                            ...content.home.aboutIntro.highlights,
+                            { id: crypto.randomUUID(), label: "New highlight", iconKey: "star" },
+                          ],
+                        },
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add highlight
+                </button>
+              </div>
+              <div className="grid gap-3">
+                {content.home.aboutIntro.highlights.map((h, i) => (
+                  <div key={h.id} className="grid gap-3 rounded-lg border border-border bg-surface p-3 sm:grid-cols-[1fr_150px_auto]">
+                    <input
+                      value={h.label}
+                      onChange={(e) => {
+                        const highlights = [...content.home.aboutIntro.highlights];
+                        highlights[i] = { ...highlights[i]!, label: e.target.value };
+                        setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, highlights } } });
+                      }}
+                      className={inputClass}
+                      placeholder="Highlight label"
+                    />
+                    <select
+                      value={h.iconKey}
+                      onChange={(e) => {
+                        const highlights = [...content.home.aboutIntro.highlights];
+                        highlights[i] = { ...highlights[i]!, iconKey: e.target.value };
+                        setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, highlights } } });
+                      }}
+                      className={inputClass}
+                    >
+                      {ICON_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const highlights = content.home.aboutIntro.highlights.filter((_, idx) => idx !== i);
+                        setContent({ ...content, home: { ...content.home, aboutIntro: { ...content.home.aboutIntro, highlights } } });
+                      }}
+                      className="rounded-lg border border-border p-2 text-error"
+                      aria-label="Remove highlight"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ===== Tech Stack items ===== */}
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">Technologies I Use</h2>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        !window.confirm(
+                          "This will replace the current list with: React.js, Next.js, TypeScript, Node.js, Tailwind CSS, WordPress, HTML5, CSS3, Figma, AI Video, Video Editing, Canva, Graphic Design, Git, GitHub. Continue?"
+                        )
+                      )
+                        return;
+                      setContent({
+                        ...content,
+                        home: {
+                          ...content.home,
+                          techStack: {
+                            ...content.home.techStack,
+                            items: [
+                              { id: crypto.randomUUID(), name: "React.js", slug: "react" },
+                              { id: crypto.randomUUID(), name: "Next.js", slug: "nextjs" },
+                              { id: crypto.randomUUID(), name: "TypeScript", slug: "typescript" },
+                              { id: crypto.randomUUID(), name: "Node.js", slug: "nodejs" },
+                              { id: crypto.randomUUID(), name: "Tailwind CSS", slug: "tailwind" },
+                              { id: crypto.randomUUID(), name: "WordPress", slug: "wordpress" },
+                              { id: crypto.randomUUID(), name: "HTML5", slug: "html" },
+                              { id: crypto.randomUUID(), name: "CSS3", slug: "css" },
+                              { id: crypto.randomUUID(), name: "Figma", slug: "figma" },
+                              { id: crypto.randomUUID(), name: "AI Video", slug: "aivideo" },
+                              { id: crypto.randomUUID(), name: "Video Editing", slug: "video-editing" },
+                              { id: crypto.randomUUID(), name: "Canva", slug: "canva" },
+                              { id: crypto.randomUUID(), name: "Graphic Design", slug: "graphic-designer" },
+                              { id: crypto.randomUUID(), name: "Git", slug: "git" },
+                              { id: crypto.randomUUID(), name: "GitHub", slug: "github" },
+                            ],
+                          },
+                        },
+                      });
+                    }}
+                    className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-medium text-primary hover:bg-primary/20"
+                  >
+                    Load recommended list
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setContent({
+                        ...content,
+                        home: {
+                          ...content.home,
+                          techStack: {
+                            ...content.home.techStack,
+                            items: [
+                              ...content.home.techStack.items,
+                              { id: crypto.randomUUID(), name: "New Technology", slug: "" },
+                            ],
+                          },
+                        },
+                      })
+                    }
+                    className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                  >
+                    <Plus className="h-4 w-4" /> Add technology
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-text-muted">
+                "Load recommended list" replaces everything below with React.js, Next.js, TypeScript, Node.js, Tailwind CSS, WordPress, HTML5, CSS3, Figma, AI Video, Video Editing, Canva, Graphic Design, Git, GitHub in one click — remember to click Save after.
+              </p>
+              <textarea value={content.home.techStack.description} onChange={(e) => setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, description: e.target.value } } })} rows={2} className={textareaClass} placeholder="Tech stack description" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                {content.home.techStack.items.map((tech, i) => (
+                  <div key={tech.id} className="flex gap-3 rounded-lg border border-border bg-surface p-3">
+                    <TechIconUploader
+                      slug={tech.slug}
+                      iconUrl={tech.iconUrl}
+                      onChange={(iconUrl) => {
+                        const items = [...content.home.techStack.items];
+                        items[i] = { ...items[i]!, iconUrl };
+                        setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, items } } });
+                      }}
+                    />
+                    <div className="grid flex-1 grid-cols-1 gap-2">
+                      <input
+                        value={tech.name}
+                        onChange={(e) => {
+                          const items = [...content.home.techStack.items];
+                          items[i] = { ...items[i]!, name: e.target.value };
+                          setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, items } } });
+                        }}
+                        className={inputClass}
+                        placeholder="Name (e.g. Canva)"
+                      />
+                      <div className="flex gap-2">
+                        <input
+                          value={tech.slug}
+                          onChange={(e) => {
+                            const items = [...content.home.techStack.items];
+                            items[i] = { ...items[i]!, slug: e.target.value };
+                            setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, items } } });
+                          }}
+                          className={inputClass}
+                          placeholder="Icon slug (e.g. canva)"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const items = content.home.techStack.items.filter((_, idx) => idx !== i);
+                            setContent({ ...content, home: { ...content.home, techStack: { ...content.home.techStack, items } } });
+                          }}
+                          className="shrink-0 rounded-lg border border-border p-2 text-error"
+                          aria-label="Remove technology"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-text-muted">
+                Built-in icons already exist for: html, css, react, nextjs, typescript, nodejs, tailwind, bootstrap, wordpress, figma, aivideo, video-editing, canva, graphic-designer, git, github — just type that slug and the logo shows automatically. For any other technology, upload its own logo (SVG/PNG) using the small icon box on the left — the uploaded logo always takes priority over the slug.
+              </p>
+            </section>
+
+            {/* ===== Services Preview items ===== */}
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">Services Preview</h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      home: {
+                        ...content.home,
+                        servicesPreview: {
+                          ...content.home.servicesPreview,
+                          items: [
+                            ...content.home.servicesPreview.items,
+                            { id: crypto.randomUUID(), title: "New Service", description: "", features: [], iconKey: "globe", href: "/services" },
+                          ],
+                        },
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add service
+                </button>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <input value={content.home.servicesPreview.eyebrow} onChange={(e) => setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, eyebrow: e.target.value } } })} className={inputClass} placeholder="Eyebrow" />
+                <input value={content.home.servicesPreview.title} onChange={(e) => setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, title: e.target.value } } })} className={inputClass} placeholder="Title" />
+              </div>
+              <textarea value={content.home.servicesPreview.description} onChange={(e) => setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, description: e.target.value } } })} rows={2} className={textareaClass} placeholder="Description" />
+
+              <div className="space-y-3">
+                {content.home.servicesPreview.items.map((svc, i) => (
+                  <div key={svc.id} className="space-y-2 rounded-lg border border-border bg-surface p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium text-text-muted">Service {i + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const items = content.home.servicesPreview.items.filter((_, idx) => idx !== i);
+                          setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, items } } });
+                        }}
+                        className="rounded-lg border border-border p-1.5 text-error"
+                        aria-label="Remove service"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-[1fr_150px]">
+                      <input
+                        value={svc.title}
+                        onChange={(e) => {
+                          const items = [...content.home.servicesPreview.items];
+                          items[i] = { ...items[i]!, title: e.target.value };
+                          setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, items } } });
+                        }}
+                        className={inputClass}
+                        placeholder="Service title"
+                      />
+                      <select
+                        value={svc.iconKey}
+                        onChange={(e) => {
+                          const items = [...content.home.servicesPreview.items];
+                          items[i] = { ...items[i]!, iconKey: e.target.value };
+                          setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, items } } });
+                        }}
+                        className={inputClass}
+                      >
+                        {ICON_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <textarea
+                      value={svc.description}
+                      onChange={(e) => {
+                        const items = [...content.home.servicesPreview.items];
+                        items[i] = { ...items[i]!, description: e.target.value };
+                        setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, items } } });
+                      }}
+                      rows={2}
+                      className={textareaClass}
+                      placeholder="Service description"
+                    />
+                    <input
+                      value={svc.features.join(", ")}
+                      onChange={(e) => {
+                        const items = [...content.home.servicesPreview.items];
+                        items[i] = { ...items[i]!, features: e.target.value.split(",").map((f) => f.trim()).filter(Boolean) };
+                        setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, items } } });
+                      }}
+                      className={inputClass}
+                      placeholder="Features, comma-separated"
+                    />
+                    <input
+                      value={svc.href}
+                      onChange={(e) => {
+                        const items = [...content.home.servicesPreview.items];
+                        items[i] = { ...items[i]!, href: e.target.value };
+                        setContent({ ...content, home: { ...content.home, servicesPreview: { ...content.home.servicesPreview, items } } });
+                      }}
+                      className={inputClass}
+                      placeholder="Link (e.g. /services)"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ===== Why Choose Me items ===== */}
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">Why Choose Me</h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      home: {
+                        ...content.home,
+                        whyChooseMe: {
+                          ...content.home.whyChooseMe,
+                          items: [
+                            ...content.home.whyChooseMe.items,
+                            { id: crypto.randomUUID(), title: "New Reason", description: "", iconKey: "star" },
+                          ],
+                        },
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add reason
+                </button>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <input value={content.home.whyChooseMe.eyebrow} onChange={(e) => setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, eyebrow: e.target.value } } })} className={inputClass} placeholder="Eyebrow" />
+                <input value={content.home.whyChooseMe.title} onChange={(e) => setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, title: e.target.value } } })} className={inputClass} placeholder="Title" />
+              </div>
+              <textarea value={content.home.whyChooseMe.description} onChange={(e) => setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, description: e.target.value } } })} rows={2} className={textareaClass} placeholder="Description" />
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {content.home.whyChooseMe.items.map((item, i) => (
+                  <div key={item.id} className="space-y-2 rounded-lg border border-border bg-surface p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium text-text-muted">Reason {i + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const items = content.home.whyChooseMe.items.filter((_, idx) => idx !== i);
+                          setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, items } } });
+                        }}
+                        className="rounded-lg border border-border p-1.5 text-error"
+                        aria-label="Remove reason"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <input
+                      value={item.title}
+                      onChange={(e) => {
+                        const items = [...content.home.whyChooseMe.items];
+                        items[i] = { ...items[i]!, title: e.target.value };
+                        setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, items } } });
+                      }}
+                      className={inputClass}
+                      placeholder="Title"
+                    />
+                    <select
+                      value={item.iconKey}
+                      onChange={(e) => {
+                        const items = [...content.home.whyChooseMe.items];
+                        items[i] = { ...items[i]!, iconKey: e.target.value };
+                        setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, items } } });
+                      }}
+                      className={inputClass}
+                    >
+                      {ICON_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                    <textarea
+                      value={item.description}
+                      onChange={(e) => {
+                        const items = [...content.home.whyChooseMe.items];
+                        items[i] = { ...items[i]!, description: e.target.value };
+                        setContent({ ...content, home: { ...content.home, whyChooseMe: { ...content.home.whyChooseMe, items } } });
+                      }}
+                      rows={2}
+                      className={textareaClass}
+                      placeholder="Description"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         )}
+
 
         {tab === "about" && (
           <div className="space-y-4">
@@ -589,6 +1117,103 @@ export function AdminDashboard({
                 <input value={content.contact.location} onChange={(e) => setContent({ ...content, contact: { ...content.contact, location: e.target.value } })} className={inputClass} placeholder="Location" />
               </div>
             </div>
+            <div className="rounded-xl border border-border bg-card p-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">About Gallery Images</h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      about: {
+                        ...content.about,
+                        galleryPhotos: [
+                          ...content.about.galleryPhotos,
+                          { id: crypto.randomUUID(), src: "", alt: "Sameer Malik photo" },
+                        ],
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add image
+                </button>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {content.about.galleryPhotos.map((photo, i) => (
+                  <div key={photo.id} className="space-y-3 rounded-lg border border-border bg-surface p-4">
+                    <ImageUploader
+                      label={`Gallery image ${i + 1}`}
+                      value={photo.src}
+                      onChange={(url) => {
+                        const galleryPhotos = [...content.about.galleryPhotos];
+                        galleryPhotos[i] = { ...galleryPhotos[i]!, src: url };
+                        setContent({ ...content, about: { ...content.about, galleryPhotos } });
+                      }}
+                      aspect="aspect-[4/5]"
+                    />
+                    <input
+                      value={photo.alt}
+                      onChange={(e) => {
+                        const galleryPhotos = [...content.about.galleryPhotos];
+                        galleryPhotos[i] = { ...galleryPhotos[i]!, alt: e.target.value };
+                        setContent({ ...content, about: { ...content.about, galleryPhotos } });
+                      }}
+                      className={inputClass}
+                      placeholder="Image alt text"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setContent({
+                          ...content,
+                          about: {
+                            ...content.about,
+                            galleryPhotos: content.about.galleryPhotos.filter((_, idx) => idx !== i),
+                          },
+                        })
+                      }
+                      className="flex items-center gap-2 text-xs text-error"
+                    >
+                      <Trash2 className="h-4 w-4" /> Remove image
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="mb-3 font-semibold text-text-primary">Skills & Client Points</h2>
+              <textarea
+                value={content.about.skills.join(", ")}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    about: {
+                      ...content.about,
+                      skills: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
+                    },
+                  })
+                }
+                rows={3}
+                className={textareaClass}
+                placeholder="Skills, comma separated"
+              />
+              <textarea
+                value={content.about.whyClientsChooseMe.join("\n")}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    about: {
+                      ...content.about,
+                      whyClientsChooseMe: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean),
+                    },
+                  })
+                }
+                rows={5}
+                className={`${textareaClass} mt-3`}
+                placeholder="One client point per line"
+              />
+            </div>
             {content.services.map((service, i) => (
               <div key={service.id} className="rounded-xl border border-border bg-card p-6">
                 <h2 className="mb-3 font-semibold text-text-primary">Service: {service.title}</h2>
@@ -596,6 +1221,133 @@ export function AdminDashboard({
                 <textarea value={service.shortDescription} onChange={(e) => { const s = [...content.services]; s[i] = { ...s[i]!, shortDescription: e.target.value }; setContent({ ...content, services: s }); }} rows={3} className={textareaClass} />
               </div>
             ))}
+
+            {/* ===== Why Work With Me (Services page) ===== */}
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">Why Work With Me (Services page)</h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      whyWorkWithMe: [
+                        ...content.whyWorkWithMe,
+                        { id: crypto.randomUUID(), title: "New Point", description: "" },
+                      ],
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add point
+                </button>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {content.whyWorkWithMe.map((item, i) => (
+                  <div key={item.id} className="space-y-2 rounded-lg border border-border bg-surface p-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={item.title}
+                        onChange={(e) => {
+                          const items = [...content.whyWorkWithMe];
+                          items[i] = { ...items[i]!, title: e.target.value };
+                          setContent({ ...content, whyWorkWithMe: items });
+                        }}
+                        className={inputClass}
+                        placeholder="Title"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const items = content.whyWorkWithMe.filter((_, idx) => idx !== i);
+                          setContent({ ...content, whyWorkWithMe: items });
+                        }}
+                        className="shrink-0 rounded-lg border border-border p-2 text-error"
+                        aria-label="Remove point"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <textarea
+                      value={item.description}
+                      onChange={(e) => {
+                        const items = [...content.whyWorkWithMe];
+                        items[i] = { ...items[i]!, description: e.target.value };
+                        setContent({ ...content, whyWorkWithMe: items });
+                      }}
+                      rows={2}
+                      className={textareaClass}
+                      placeholder="Description"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ===== Development Process (About + Services pages) ===== */}
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-text-primary">Development Process (About & Services pages)</h2>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      developmentProcess: [
+                        ...content.developmentProcess,
+                        { id: crypto.randomUUID(), step: "New Step", description: "" },
+                      ],
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add step
+                </button>
+              </div>
+              <div className="space-y-3">
+                {content.developmentProcess.map((step, i) => (
+                  <div key={step.id} className="flex items-start gap-3 rounded-lg border border-border bg-surface p-3">
+                    <span className="mt-2.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {i + 1}
+                    </span>
+                    <div className="flex-1 space-y-2">
+                      <input
+                        value={step.step}
+                        onChange={(e) => {
+                          const items = [...content.developmentProcess];
+                          items[i] = { ...items[i]!, step: e.target.value };
+                          setContent({ ...content, developmentProcess: items });
+                        }}
+                        className={inputClass}
+                        placeholder="Step name (e.g. Discover)"
+                      />
+                      <textarea
+                        value={step.description}
+                        onChange={(e) => {
+                          const items = [...content.developmentProcess];
+                          items[i] = { ...items[i]!, description: e.target.value };
+                          setContent({ ...content, developmentProcess: items });
+                        }}
+                        rows={2}
+                        className={textareaClass}
+                        placeholder="Description"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const items = content.developmentProcess.filter((_, idx) => idx !== i);
+                        setContent({ ...content, developmentProcess: items });
+                      }}
+                      className="mt-1 shrink-0 rounded-lg border border-border p-2 text-error"
+                      aria-label="Remove step"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         )}
 
@@ -701,6 +1453,40 @@ export function AdminDashboard({
 
         {tab === "testimonials" && (
           <div className="space-y-4">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h3 className="mb-1 text-sm font-semibold text-text-primary">
+                Reviews carousel speed
+              </h3>
+              <p className="mb-3 text-xs text-text-muted">
+                Only 3 reviews show on the homepage at a time. Once there are
+                more than 3, they auto-scroll — choose how many seconds each
+                set stays on screen before moving to the next (visitors can
+                also use the arrow buttons to move back/forward manually).
+              </p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min={2}
+                  max={60}
+                  value={content.settings.testimonialAutoScrollSeconds}
+                  onChange={(e) =>
+                    setContent({
+                      ...content,
+                      settings: {
+                        ...content.settings,
+                        testimonialAutoScrollSeconds: Math.max(
+                          2,
+                          Number(e.target.value) || 6
+                        ),
+                      },
+                    })
+                  }
+                  className={`${inputClass} max-w-[120px]`}
+                />
+                <span className="text-xs text-text-muted">seconds</span>
+              </div>
+            </div>
+
             {pendingReviews.length > 0 && (
               <div className="space-y-3 rounded-xl border border-accent/40 bg-accent/5 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
@@ -844,6 +1630,150 @@ export function AdminDashboard({
               </div>
             </section>
 
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-semibold text-text-primary">Header Navigation</h2>
+                  <p className="mt-1 text-xs text-text-muted">These links show in the top menu and footer quick links.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      settings: {
+                        ...content.settings,
+                        navLinks: [...content.settings.navLinks, { label: "New Link", href: "/" }],
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add link
+                </button>
+              </div>
+              <div className="space-y-3">
+                {content.settings.navLinks.map((link, i) => (
+                  <div key={`${link.href}-${i}`} className="grid gap-3 rounded-lg border border-border bg-surface p-4 sm:grid-cols-[1fr_1fr_auto]">
+                    <input
+                      value={link.label}
+                      onChange={(e) => {
+                        const navLinks = [...content.settings.navLinks];
+                        navLinks[i] = { ...navLinks[i]!, label: e.target.value };
+                        setContent({ ...content, settings: { ...content.settings, navLinks } });
+                      }}
+                      className={inputClass}
+                      placeholder="Label"
+                    />
+                    <input
+                      value={link.href}
+                      onChange={(e) => {
+                        const navLinks = [...content.settings.navLinks];
+                        navLinks[i] = { ...navLinks[i]!, href: e.target.value };
+                        setContent({ ...content, settings: { ...content.settings, navLinks } });
+                      }}
+                      className={inputClass}
+                      placeholder="/about"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setContent({
+                          ...content,
+                          settings: {
+                            ...content.settings,
+                            navLinks: content.settings.navLinks.filter((_, idx) => idx !== i),
+                          },
+                        })
+                      }
+                      className="rounded-lg border border-border p-2 text-error"
+                      aria-label="Remove navigation link"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-semibold text-text-primary">Footer Content</h2>
+                  <p className="mt-1 text-xs text-text-muted">Edit the footer intro and legal/utility links.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      settings: {
+                        ...content.settings,
+                        footerLinks: [...content.settings.footerLinks, { label: "New Footer Link", href: "/" }],
+                      },
+                    })
+                  }
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:text-text-primary"
+                >
+                  <Plus className="h-4 w-4" /> Add footer link
+                </button>
+              </div>
+              <textarea
+                value={content.settings.footerDescription}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    settings: { ...content.settings, footerDescription: e.target.value },
+                  })
+                }
+                rows={3}
+                className={textareaClass}
+                placeholder="Footer description"
+              />
+              <div className="space-y-3">
+                {content.settings.footerLinks.map((link, i) => (
+                  <div key={`${link.href}-${i}`} className="grid gap-3 rounded-lg border border-border bg-surface p-4 sm:grid-cols-[1fr_1fr_auto]">
+                    <input
+                      value={link.label}
+                      onChange={(e) => {
+                        const footerLinks = [...content.settings.footerLinks];
+                        footerLinks[i] = { ...footerLinks[i]!, label: e.target.value };
+                        setContent({ ...content, settings: { ...content.settings, footerLinks } });
+                      }}
+                      className={inputClass}
+                      placeholder="Label"
+                    />
+                    <input
+                      value={link.href}
+                      onChange={(e) => {
+                        const footerLinks = [...content.settings.footerLinks];
+                        footerLinks[i] = { ...footerLinks[i]!, href: e.target.value };
+                        setContent({ ...content, settings: { ...content.settings, footerLinks } });
+                      }}
+                      className={inputClass}
+                      placeholder="/privacy-policy"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setContent({
+                          ...content,
+                          settings: {
+                            ...content.settings,
+                            footerLinks: content.settings.footerLinks.filter((_, idx) => idx !== i),
+                          },
+                        })
+                      }
+                      className="rounded-lg border border-border p-2 text-error"
+                      aria-label="Remove footer link"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             <section className="space-y-4">
               <h2 className="font-semibold text-text-primary">Page Header Backgrounds</h2>
               <p className="text-xs text-text-muted">
@@ -890,6 +1820,51 @@ export function AdminDashboard({
                       />
                     </div>
                   </div>
+                </div>
+              ))}
+            </section>
+
+            <section className="space-y-4">
+              <h2 className="font-semibold text-text-primary">Page Header Text</h2>
+              <p className="text-xs text-text-muted">
+                The eyebrow, title, and description shown in the banner at the top of each page.
+              </p>
+              {(Object.keys(pageHeroTextLabels) as PageHeroTextKey[]).map((key) => (
+                <div key={key} className="space-y-2 rounded-xl border border-border bg-card p-5">
+                  <h3 className="text-sm font-medium text-text-primary">
+                    {pageHeroTextLabels[key]}
+                  </h3>
+                  <input
+                    value={content.settings.pageHeroText[key].eyebrow}
+                    onChange={(e) => {
+                      const pageHeroText = { ...content.settings.pageHeroText };
+                      pageHeroText[key] = { ...pageHeroText[key], eyebrow: e.target.value };
+                      setContent({ ...content, settings: { ...content.settings, pageHeroText } });
+                    }}
+                    className={inputClass}
+                    placeholder="Eyebrow (small label above the title, optional)"
+                  />
+                  <input
+                    value={content.settings.pageHeroText[key].title}
+                    onChange={(e) => {
+                      const pageHeroText = { ...content.settings.pageHeroText };
+                      pageHeroText[key] = { ...pageHeroText[key], title: e.target.value };
+                      setContent({ ...content, settings: { ...content.settings, pageHeroText } });
+                    }}
+                    className={inputClass}
+                    placeholder="Title"
+                  />
+                  <textarea
+                    value={content.settings.pageHeroText[key].description}
+                    onChange={(e) => {
+                      const pageHeroText = { ...content.settings.pageHeroText };
+                      pageHeroText[key] = { ...pageHeroText[key], description: e.target.value };
+                      setContent({ ...content, settings: { ...content.settings, pageHeroText } });
+                    }}
+                    rows={2}
+                    className={textareaClass}
+                    placeholder="Description"
+                  />
                 </div>
               ))}
             </section>
@@ -1028,6 +2003,57 @@ export function AdminDashboard({
           </div>
         )}
 
+        {tab === "settings" && (
+          <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+            <h2 className="font-semibold text-text-primary">SEO & Search Console</h2>
+            <p className="text-xs text-text-muted">
+              These connect your site to Google Search Console, Bing Webmaster Tools, and (optionally) Google Tag Manager — so the site can rank and be tracked properly. Paste only the verification code itself, not the full HTML tag.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm text-text-secondary">Google Search Console verification code</label>
+                <input
+                  value={content.settings.seo.googleSiteVerification}
+                  onChange={(e) => setContent({ ...content, settings: { ...content.settings, seo: { ...content.settings.seo, googleSiteVerification: e.target.value } } })}
+                  className={inputClass}
+                  placeholder="e.g. Y4snnMZUcOQAHqt3d7Q5..."
+                />
+                <p className="mt-1 text-xs text-text-muted">
+                  From search.google.com/search-console → Settings → Ownership verification → HTML tag → copy just the "content" value.
+                </p>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm text-text-secondary">Bing Webmaster Tools verification code</label>
+                <input
+                  value={content.settings.seo.bingSiteVerification}
+                  onChange={(e) => setContent({ ...content, settings: { ...content.settings, seo: { ...content.settings.seo, bingSiteVerification: e.target.value } } })}
+                  className={inputClass}
+                  placeholder="From bing.com/webmasters"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm text-text-secondary">Google Tag Manager ID (optional)</label>
+                <input
+                  value={content.settings.seo.googleTagManagerId}
+                  onChange={(e) => setContent({ ...content, settings: { ...content.settings, seo: { ...content.settings.seo, googleTagManagerId: e.target.value } } })}
+                  className={inputClass}
+                  placeholder="GTM-XXXXXXX"
+                />
+                <p className="mt-1 text-xs text-text-muted">Only needed if you use GTM instead of / alongside plain GA4.</p>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm text-text-secondary">Pinterest domain verification (optional)</label>
+                <input
+                  value={content.settings.seo.pinterestVerification}
+                  onChange={(e) => setContent({ ...content, settings: { ...content.settings, seo: { ...content.settings.seo, pinterestVerification: e.target.value } } })}
+                  className={inputClass}
+                  placeholder="From Pinterest business account"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {tab === "account" && (
           <div className="space-y-6">
             <div className="space-y-4 rounded-xl border border-border bg-card p-6">
@@ -1114,12 +2140,12 @@ export function AdminDashboard({
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm text-text-secondary">Current password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={accountForm.currentPassword}
-                    onChange={(e) => setAccountForm({ ...accountForm, currentPassword: e.target.value })}
+                    onChange={(v) => setAccountForm({ ...accountForm, currentPassword: v })}
                     className={inputClass}
                     placeholder="Current password"
+                    autoComplete="current-password"
                   />
                 </div>
                 <div>
@@ -1133,10 +2159,9 @@ export function AdminDashboard({
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-text-secondary">New password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={accountForm.newPassword}
-                    onChange={(e) => setAccountForm({ ...accountForm, newPassword: e.target.value })}
+                    onChange={(v) => setAccountForm({ ...accountForm, newPassword: v })}
                     className={inputClass}
                     placeholder="At least 6 characters"
                   />
@@ -1165,10 +2190,9 @@ export function AdminDashboard({
                   className={inputClass}
                   placeholder="Username"
                 />
-                <input
-                  type="password"
+                <PasswordInput
                   value={newUserForm.password}
-                  onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
+                  onChange={(v) => setNewUserForm({ ...newUserForm, password: v })}
                   className={inputClass}
                   placeholder="Password"
                 />

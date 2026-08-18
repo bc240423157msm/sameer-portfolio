@@ -12,7 +12,7 @@ import {
   MotionReveal,
 } from "@/components/common/MotionReveal";
 import { getSiteContent } from "@/lib/data";
-import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, createPageMetadata, faqJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Portfolio",
@@ -30,16 +30,19 @@ export default async function PortfolioPage() {
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Portfolio", path: "/portfolio" },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Portfolio", path: "/portfolio" },
+          ]),
+          faqJsonLd(content.faq.slice(0, 6)),
+        ]}
       />
       <PageHero
         variant="portfolio"
-        eyebrow="Portfolio"
-        title="Selected work"
-        description="Real projects for real businesses — from luxury e-commerce websites to AI-powered WhatsApp automation systems."
+        eyebrow={content.settings.pageHeroText.portfolio.eyebrow}
+        title={content.settings.pageHeroText.portfolio.title}
+        description={content.settings.pageHeroText.portfolio.description}
       />
 
       <section className="py-24">

@@ -14,5 +14,6 @@ export interface SiteConfig {
   title: string;
   description: string;
   url: string;
+  bookingUrl: string;
   socialProfiles: string[];
 }

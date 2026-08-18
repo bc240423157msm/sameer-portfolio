@@ -1,7 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { cn } from "@/utils/cn";
+
+/**
+ * Safety net: whileInView relies on an IntersectionObserver being set up
+ * and firing correctly. In some cases (elements already in the viewport
+ * on load, slow JS hydration, etc.) that never happens, which would leave
+ * content stuck at opacity:0 forever. This hook forces the "visible" state
+ * after a short timeout so nothing stays permanently hidden.
+ */
+function useRevealFallback(delayMs = 700) {
+  const [forceVisible, setForceVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setForceVisible(true), delayMs);
+    return () => clearTimeout(timer);
+  }, [delayMs]);
+
+  return forceVisible;
+}
 
 interface MotionRevealProps {
   children: React.ReactNode;
@@ -25,6 +44,7 @@ export function MotionReveal({
   direction = "up",
 }: MotionRevealProps) {
   const offset = directionOffset[direction];
+  const forceVisible = useRevealFallback();
 
   const variants: Variants = {
     hidden: { opacity: 0, ...offset },
@@ -40,6 +60,7 @@ export function MotionReveal({
     <motion.div
       className={cn(className)}
       initial="hidden"
+      animate={forceVisible ? "visible" : undefined}
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
       variants={variants}
@@ -60,10 +81,13 @@ export function StaggerContainer({
   className,
   stagger = 0.1,
 }: StaggerContainerProps) {
+  const forceVisible = useRevealFallback();
+
   return (
     <motion.div
       className={cn(className)}
       initial="hidden"
+      animate={forceVisible ? "visible" : undefined}
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
       variants={{

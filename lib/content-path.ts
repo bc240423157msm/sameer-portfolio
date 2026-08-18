@@ -53,10 +53,14 @@ export function isValidContentPath(path: string): boolean {
   if (!path || path.includes("..")) return false;
   const allowedPrefixes = [
     "hero",
+    "home",
     "about",
     "contact",
+    "contactPage",
     "settings",
     "services",
+    "whyWorkWithMe",
+    "developmentProcess",
     "portfolio",
     "faq",
     "testimonials",

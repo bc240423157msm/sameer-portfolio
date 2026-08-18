@@ -26,6 +26,9 @@ export default async function SiteLayout({
       whatsappNumber={content.settings.whatsappNumber}
       branding={content.settings.branding}
       socialLinks={content.settings.socialLinks}
+      navLinks={content.settings.navLinks}
+      footerLinks={content.settings.footerLinks}
+      footerDescription={content.settings.footerDescription}
       isAdmin={!!isAdmin}
       extraNavLinks={extraNavLinks}
     >

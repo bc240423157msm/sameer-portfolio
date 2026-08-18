@@ -11,38 +11,56 @@ import {
 } from "@/components/common/MotionReveal";
 import { Badge } from "@/components/ui/Badge";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { servicePreviews } from "@/lib/content";
+import { EditableText } from "@/components/common/EditableText";
+import { EditableIcon } from "@/components/common/EditableIcon";
 import { cn } from "@/utils/cn";
+import type { SiteContent } from "@/types/content";
 
-export function ServicesPreview() {
+interface ServicesPreviewClientProps {
+  servicesPreview: SiteContent["home"]["servicesPreview"];
+}
+
+export function ServicesPreviewClient({
+  servicesPreview,
+}: ServicesPreviewClientProps) {
   return (
     <section className="border-b border-border/60 py-24">
       <Container>
         <MotionReveal>
           <SectionHeading
-            eyebrow="Services"
-            title="Solutions built for your business"
-            description="From custom websites to AI automation — I help you ship faster, work smarter, and grow with confidence."
+            eyebrow={servicesPreview.eyebrow}
+            title={servicesPreview.title}
+            description={servicesPreview.description}
+            contentPathPrefix="home.servicesPreview"
           />
         </MotionReveal>
 
         <StaggerContainer className="mt-16 grid gap-6 md:grid-cols-3">
-          {servicePreviews.map((service) => {
-            const Icon = service.icon;
-            return (
-              <StaggerItem key={service.title}>
-                <TiltCard className="h-full">
+          {servicesPreview.items.map((service, index) => (
+            <StaggerItem key={service.id}>
+              <TiltCard className="h-full">
                 <div className="group flex h-full flex-col rounded-2xl border border-border/60 bg-card/40 p-8 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/70 hover:shadow-lg hover:shadow-primary/5">
-                  <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
-                    <Icon className="h-6 w-6" />
-                  </div>
+                  <EditableIcon
+                    contentPath={`home.servicesPreview.items.${index}.iconKey`}
+                    iconKey={service.iconKey}
+                    wrapperClassName="mb-6 h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20"
+                    iconClassName="h-6 w-6"
+                  />
 
-                  <h3 className="text-xl font-semibold text-text-primary">
+                  <EditableText
+                    contentPath={`home.servicesPreview.items.${index}.title`}
+                    as="h3"
+                    className="text-xl font-semibold text-text-primary"
+                  >
                     {service.title}
-                  </h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-text-secondary">
+                  </EditableText>
+                  <EditableText
+                    contentPath={`home.servicesPreview.items.${index}.description`}
+                    as="p"
+                    className="mt-3 flex-1 text-sm leading-relaxed text-text-secondary"
+                  >
                     {service.description}
-                  </p>
+                  </EditableText>
 
                   <div className="mt-6 flex flex-wrap gap-2">
                     {service.features.map((feature) => (
@@ -60,10 +78,9 @@ export function ServicesPreview() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>
-                </TiltCard>
-              </StaggerItem>
-            );
-          })}
+              </TiltCard>
+            </StaggerItem>
+          ))}
         </StaggerContainer>
       </Container>
     </section>

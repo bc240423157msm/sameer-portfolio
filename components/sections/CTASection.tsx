@@ -4,12 +4,19 @@ import { Calendar, ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { MotionReveal } from "@/components/common/MotionReveal";
 import { Button } from "@/components/ui/Button";
+import { EditableText } from "@/components/common/EditableText";
 
 interface CTASectionProps {
   calendlyUrl?: string;
+  title?: string;
+  description?: string;
 }
 
-export function CTASection({ calendlyUrl }: CTASectionProps) {
+export function CTASection({
+  calendlyUrl,
+  title = "Ready for a Website Design or Redesign?",
+  description = "Whether you need a new business website, a WordPress redesign, a WhatsApp bot, or an AI chatbot — let's discuss your project and build something that drives results.",
+}: CTASectionProps) {
   return (
     <section className="py-24">
       <Container>
@@ -21,14 +28,20 @@ export function CTASection({ calendlyUrl }: CTASectionProps) {
             />
 
             <div className="relative">
-              <h2 className="text-balance text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-                Ready for a Website Design or Redesign?
-              </h2>
-              <p className="mx-auto mt-5 max-w-xl text-lg text-text-secondary">
-                Whether you need a new business website, a WordPress redesign, a
-                WhatsApp bot, or an AI chatbot — let&apos;s discuss your project
-                and build something that drives results.
-              </p>
+              <EditableText
+                contentPath="home.cta.title"
+                as="h2"
+                className="text-balance text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl"
+              >
+                {title}
+              </EditableText>
+              <EditableText
+                contentPath="home.cta.description"
+                as="p"
+                className="mx-auto mt-5 max-w-xl text-lg text-text-secondary"
+              >
+                {description}
+              </EditableText>
 
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Button href="/contact" size="lg">

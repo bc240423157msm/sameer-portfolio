@@ -3,15 +3,16 @@ import type { NavLink, SiteConfig, SocialLink } from "@/types";
 export const siteConfig: SiteConfig = {
   name: "Sameer Malik",
   title:
-    "Sameer Malik | Website Design, WordPress & WhatsApp Bot Developer",
+    "Sameer Malik | Software Engineer & Website Design, WordPress, WhatsApp Bot Developer",
   description:
-    "Professional website design, website redesign, WordPress development, AI chatbots, and WhatsApp bot development for startups, agencies, and businesses worldwide.",
+    "Sameer Malik is a software engineer offering professional website design, website redesign, WordPress development, AI chatbots, and WhatsApp bot development for startups, agencies, and businesses worldwide.",
   url: "https://sameermalik.dev",
+  bookingUrl: "https://calendly.com/sameer03238867440/30min",
   socialProfiles: [
-    "https://github.com/sameermalik",
-    "https://linkedin.com/in/sameermalik",
-    "https://upwork.com/freelancers/~sameermalik",
-    "https://fiverr.com/sameermalik",
+    "https://github.com/bc240423157msm",
+    "https://linkedin.com/in/sameermalik400",
+    "https://www.upwork.com/freelancers/~0185021876ca3ab5af",
+    "https://www.fiverr.com/sellers/msameermalik786/",
   ],
 };
 
@@ -49,6 +50,11 @@ export const socialLinks: SocialLink[] = [
   {
     label: "Fiverr",
     href: "https://www.fiverr.com/sellers/msameermalik786/",
+    external: true,
+  },
+  {
+    label: "Book a Call",
+    href: "https://calendly.com/sameer03238867440/30min",
     external: true,
   },
 ];

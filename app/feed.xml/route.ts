@@ -1,6 +1,19 @@
 import { getPublishedBlogPosts } from "@/lib/data";
 import { siteConfig } from "@/lib/site-config";
 
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function cdata(value: string) {
+  return `<![CDATA[${value.replaceAll("]]>", "]]]]><![CDATA[>")}]]>`;
+}
+
 export async function GET() {
   const posts = await getPublishedBlogPosts();
 
@@ -8,12 +21,12 @@ export async function GET() {
     .map(
       (post) => `
     <item>
-      <title><![CDATA[${post.title}]]></title>
+      <title>${cdata(post.title)}</title>
       <link>${siteConfig.url}/blog/${post.slug}</link>
       <guid isPermaLink="true">${siteConfig.url}/blog/${post.slug}</guid>
-      <description><![CDATA[${post.excerpt}]]></description>
+      <description>${cdata(post.excerpt)}</description>
       <pubDate>${new Date(post.createdAt).toUTCString()}</pubDate>
-      <category>${post.category}</category>
+      <category>${escapeXml(post.category)}</category>
     </item>`
     )
     .join("");

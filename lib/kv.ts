@@ -27,10 +27,11 @@ const redisUrl =
   process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const redisToken =
   process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const isProductionBuild = process.env.NEXT_PHASE === "phase-production-build";
 
 export const isDbConfigured = Boolean(redisUrl && redisToken);
 
-const redis = isDbConfigured
+const redis = isDbConfigured && !isProductionBuild
   ? new Redis({ url: redisUrl!, token: redisToken! })
   : null;
 

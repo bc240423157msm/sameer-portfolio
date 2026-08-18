@@ -3,6 +3,7 @@ import { PageHero } from "@/components/common/PageHero";
 import { Container } from "@/components/layout/Container";
 import { ReviewForm } from "@/components/sections/ReviewForm";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getSiteContent } from "@/lib/data";
 import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -12,7 +13,8 @@ export const metadata: Metadata = createPageMetadata({
   path: "/leave-a-review",
 });
 
-export default function LeaveAReviewPage() {
+export default async function LeaveAReviewPage() {
+  const content = await getSiteContent();
   return (
     <>
       <JsonLd
@@ -23,9 +25,9 @@ export default function LeaveAReviewPage() {
       />
       <PageHero
         variant="contact"
-        eyebrow="Reviews"
-        title="Share your experience"
-        description="Worked together on a project? A quick review helps other clients know what to expect."
+        eyebrow={content.settings.pageHeroText["leave-a-review"].eyebrow}
+        title={content.settings.pageHeroText["leave-a-review"].title}
+        description={content.settings.pageHeroText["leave-a-review"].description}
       />
       <section className="py-20">
         <Container className="mx-auto max-w-xl">

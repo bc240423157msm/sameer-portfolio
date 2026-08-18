@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { MotionReveal } from "@/components/common/MotionReveal";
@@ -26,6 +26,8 @@ interface HeroClientProps {
 export function HeroClient({ hero, headerImage, branding }: HeroClientProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const spotlightHandlers = useSpotlightHandlers(sectionRef);
+  const [heroImageSrc, setHeroImageSrc] = useState(headerImage.src);
+  const [logoSrc, setLogoSrc] = useState(branding.logoSrc);
 
   return (
     <section
@@ -35,13 +37,18 @@ export function HeroClient({ hero, headerImage, branding }: HeroClientProps) {
       onMouseLeave={spotlightHandlers.onMouseLeave}
     >
       <Image
-        src={headerImage.src}
+        src={heroImageSrc}
         alt={headerImage.alt}
         fill
         priority
         quality={80}
         className="object-cover object-center"
         sizes="100vw"
+        onError={() => {
+          if (heroImageSrc !== "/Home_Background.webp") {
+            setHeroImageSrc("/Home_Background.webp");
+          }
+        }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/75 to-background/35" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-background/25" />
@@ -116,11 +123,14 @@ export function HeroClient({ hero, headerImage, branding }: HeroClientProps) {
 
               <div className="relative flex items-center gap-2 whitespace-nowrap rounded-full border border-border/60 bg-card/90 px-4 py-2 shadow-xl shadow-primary/10 backdrop-blur-sm">
                 <Image
-                  src={branding.logoSrc}
+                  src={logoSrc}
                   alt={branding.logoAlt}
                   width={20}
                   height={20}
                   className="h-5 w-5"
+                  onError={() => {
+                    if (logoSrc !== "/logo.webp") setLogoSrc("/logo.webp");
+                  }}
                 />
                 <span className="text-xs font-medium text-text-secondary">
                   Website Design · WordPress · WhatsApp Bots

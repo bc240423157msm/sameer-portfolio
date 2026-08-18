@@ -1,12 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import { Camera } from "lucide-react";
 import { useEditMode } from "@/components/portal/AdminToolbar";
 import { useToast } from "@/components/ui/Toast";
-import { ImageUploader } from "@/components/portal/ImageUploader";
 import { cn } from "@/utils/cn";
+
+// ImageUploader (drag-drop handling, upload API calls, preview UI) is only
+// ever needed by a logged-in admin who opens the picker — regular visitors
+// should never pay for its JS. Loading it on demand keeps it out of the
+// bundle everyone else downloads.
+const ImageUploader = dynamic(() =>
+  import("@/components/portal/ImageUploader").then((m) => ({
+    default: m.ImageUploader,
+  }))
+);
 
 interface EditableImageProps {
   contentPath: string;
@@ -17,6 +27,8 @@ interface EditableImageProps {
   sizes?: string;
   width?: number;
   height?: number;
+  /** Shown if `src` fails to load (e.g. a removed/renamed file). */
+  fallbackSrc?: string;
 }
 
 export function EditableImage({
@@ -28,11 +40,29 @@ export function EditableImage({
   sizes,
   width,
   height,
+  fallbackSrc,
 }: EditableImageProps) {
   const editMode = useEditMode();
   const { success, error } = useToast();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(src);
+  const [currentSrc, setCurrentSrc] = useState(src || fallbackSrc || "");
+  const [didFallback, setDidFallback] = useState(false);
+  // Tracks the `src` this state was last synced to, so we can tell whether
+  // the prop changed since the last render (see below).
+  const [syncedSrc, setSyncedSrc] = useState(src);
+
+  // `src` can change after this component has already mounted — e.g. the
+  // section's content is edited, a different item is loaded into the same
+  // slot, or the site content refreshes from the server. Without this, the
+  // image would keep showing whatever was passed in on the very first
+  // render, ignoring any later section/content change. This "adjusting
+  // state during render" pattern (rather than an effect) avoids an extra
+  // render pass — see https://react.dev/learn/you-might-not-need-an-effect
+  if (src !== syncedSrc) {
+    setSyncedSrc(src);
+    setCurrentSrc(src || fallbackSrc || "");
+    setDidFallback(false);
+  }
 
   const saveImage = useCallback(
     async (url: string) => {
@@ -62,16 +92,30 @@ export function EditableImage({
 
   return (
     <div className={cn("relative", className)}>
-      <Image
-        src={currentSrc}
-        alt={alt}
-        fill={fill}
-        width={!fill ? width : undefined}
-        height={!fill ? height : undefined}
-        sizes={sizes}
-        className="object-cover"
-        data-cursor="view"
-      />
+      {currentSrc ? (
+        <Image
+          src={currentSrc}
+          alt={alt}
+          fill={fill}
+          width={!fill ? width : undefined}
+          height={!fill ? height : undefined}
+          sizes={sizes}
+          className="object-cover"
+          data-cursor="view"
+          onError={() => {
+            if (fallbackSrc && !didFallback) {
+              setDidFallback(true);
+              setCurrentSrc(fallbackSrc);
+            } else {
+              setCurrentSrc("");
+            }
+          }}
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-card/60 text-xs text-text-secondary">
+          No image
+        </div>
+      )}
       {editMode && (
         <>
           <button

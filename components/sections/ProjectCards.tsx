@@ -3,13 +3,26 @@
 import Link from "next/link";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { ImageSpotlight } from "@/components/common/ImageSpotlight";
+import { EditableImage } from "@/components/common/EditableImage";
 import { TiltCard } from "@/components/common/TiltCard";
 import { Badge } from "@/components/ui/Badge";
 import type { SiteContent } from "@/types/content";
 
 type Project = SiteContent["portfolio"][number];
 
-export function FeaturedProjectCard({ project }: { project: Project }) {
+interface FeaturedProjectCardProps {
+  project: Project;
+  /** When provided, the cover image becomes admin-editable at
+   * `portfolio.{projectIndex}.image` (used on the homepage's featured
+   * projects grid). Omit on pages where the image shouldn't be editable
+   * inline. */
+  projectIndex?: number;
+}
+
+export function FeaturedProjectCard({
+  project,
+  projectIndex,
+}: FeaturedProjectCardProps) {
   return (
     <TiltCard className="h-full">
       <Link
@@ -17,11 +30,20 @@ export function FeaturedProjectCard({ project }: { project: Project }) {
         className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/40 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
       >
         <div className="relative h-48 w-full">
-          <ImageSpotlight
-            src={project.image}
-            alt={`${project.title} — ${project.subtitle}`}
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
+          {projectIndex !== undefined ? (
+            <EditableImage
+              contentPath={`portfolio.${projectIndex}.image`}
+              src={project.image}
+              alt={`${project.title} — ${project.subtitle}`}
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          ) : (
+            <ImageSpotlight
+              src={project.image}
+              alt={`${project.title} — ${project.subtitle}`}
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          )}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
           <div className="pointer-events-none absolute bottom-4 left-4 right-4">
             <p className="text-lg font-semibold text-text-primary drop-shadow">

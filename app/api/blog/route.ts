@@ -8,6 +8,22 @@ import {
 import { slugify } from "@/utils/slugify";
 import type { BlogPost } from "@/types/content";
 
+function uniqueBlogSlug(
+  posts: BlogPost[],
+  requestedSlug: string,
+  currentPostId?: string
+) {
+  const baseSlug = slugify(requestedSlug) || "blog-post";
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (posts.some((p) => p.id !== currentPostId && p.slug === slug)) {
+    slug = `${baseSlug}-${counter++}`;
+  }
+
+  return slug;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const all = searchParams.get("all") === "true";
@@ -64,12 +80,7 @@ export async function POST(request: Request) {
 
     const posts = await getBlogPosts();
     const now = new Date().toISOString();
-    const baseSlug = requestedSlug ? slugify(requestedSlug) : slugify(title);
-    let slug = baseSlug;
-    let counter = 1;
-    while (posts.some((p) => p.slug === slug)) {
-      slug = `${baseSlug}-${counter++}`;
-    }
+    const slug = uniqueBlogSlug(posts, requestedSlug ?? title);
 
     const newPost: BlogPost = {
       id: crypto.randomUUID(),
@@ -115,9 +126,12 @@ export async function PUT(request: Request) {
     }
 
     const existing = posts[index]!;
+    const nextSlug = updates.slug
+      ? uniqueBlogSlug(posts, updates.slug, existing.id)
+      : existing.slug;
     const updated: BlogPost = {
       id: existing.id,
-      slug: updates.slug ? slugify(updates.slug) : existing.slug,
+      slug: nextSlug,
       title: updates.title ?? existing.title,
       excerpt: updates.excerpt ?? existing.excerpt,
       content: updates.content ?? existing.content,

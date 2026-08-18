@@ -6,7 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CTASectionWrapper } from "@/components/sections/CTASectionWrapper";
 import { BlogSearch } from "@/components/blog/BlogSearch";
 import { MotionReveal } from "@/components/common/MotionReveal";
-import { getPublishedBlogPosts } from "@/lib/data";
+import { getPublishedBlogPosts, getSiteContent } from "@/lib/data";
 import { breadcrumbJsonLd, blogListingJsonLd, createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -21,6 +21,7 @@ export const revalidate = 3600;
 
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts();
+  const content = await getSiteContent();
 
   return (
     <>
@@ -35,9 +36,9 @@ export default async function BlogPage() {
       />
       <PageHero
         variant="blog"
-        eyebrow="Blog"
-        title="Notes on development & automation"
-        description="Insights on web development, SEO-friendly websites, AI automation, and working with international clients."
+        eyebrow={content.settings.pageHeroText.blog.eyebrow}
+        title={content.settings.pageHeroText.blog.title}
+        description={content.settings.pageHeroText.blog.description}
       />
 
       <section className="py-24">

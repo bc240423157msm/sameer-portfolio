@@ -31,7 +31,11 @@ export async function Testimonials() {
           />
         </MotionReveal>
 
-        <TestimonialsGrid testimonials={testimonials} likes={likes} />
+        <TestimonialsGrid
+          testimonials={testimonials}
+          likes={likes}
+          autoScrollSeconds={content.settings.testimonialAutoScrollSeconds}
+        />
 
         <div className="mt-10 text-center">
           <Link

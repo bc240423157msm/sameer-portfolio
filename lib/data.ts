@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type {
   BlogComment,
   BlogPost,
@@ -22,6 +23,21 @@ export interface MediaItem {
   usedIn: string[];
 }
 
+// Technologies that must never appear in the "Technologies I Use" section,
+// no matter what is saved in the database. This is a hard, permanent block —
+// not just a default — so old/stale saved data can never bring them back.
+const BLOCKED_TECH_SLUGS = new Set(["supabase", "postgresql", "postgres"]);
+
+function sanitizeTechItems(
+  items: SiteContent["home"]["techStack"]["items"]
+): SiteContent["home"]["techStack"]["items"] {
+  return items.filter(
+    (item) =>
+      !BLOCKED_TECH_SLUGS.has(item.slug.toLowerCase().trim()) &&
+      !BLOCKED_TECH_SLUGS.has(item.name.toLowerCase().trim())
+  );
+}
+
 function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
   const settings: Partial<SiteContent["settings"]> = partial.settings ?? {};
   return {
@@ -35,6 +51,15 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
         ...defaultSiteContent.settings.branding,
         ...settings.branding,
       },
+      seo: {
+        ...defaultSiteContent.settings.seo,
+        ...settings.seo,
+      },
+      navLinks: settings.navLinks ?? defaultSiteContent.settings.navLinks,
+      footerLinks: settings.footerLinks ?? defaultSiteContent.settings.footerLinks,
+      footerDescription:
+        settings.footerDescription ??
+        defaultSiteContent.settings.footerDescription,
       pageHeaders: {
         ...defaultSiteContent.settings.pageHeaders,
         ...(settings.pageHeaders ?? {}),
@@ -52,29 +77,129 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
           ])
         ),
       },
+      pageHeroText: {
+        ...defaultSiteContent.settings.pageHeroText,
+        ...(settings.pageHeroText ?? {}),
+        ...Object.fromEntries(
+          (
+            Object.keys(
+              defaultSiteContent.settings.pageHeroText
+            ) as (keyof typeof defaultSiteContent.settings.pageHeroText)[]
+          ).map((key) => [
+            key,
+            {
+              ...defaultSiteContent.settings.pageHeroText[key],
+              ...(settings.pageHeroText?.[key] ?? {}),
+            },
+          ])
+        ),
+      },
     },
-    about: { ...defaultSiteContent.about, ...partial.about },
+    about: {
+      ...defaultSiteContent.about,
+      ...partial.about,
+      skills: partial.about?.skills ?? defaultSiteContent.about.skills,
+      whyClientsChooseMe:
+        partial.about?.whyClientsChooseMe ??
+        defaultSiteContent.about.whyClientsChooseMe,
+      detailsImage: {
+        ...defaultSiteContent.about.detailsImage,
+        ...partial.about?.detailsImage,
+      },
+      galleryPhotos:
+        partial.about?.galleryPhotos ?? defaultSiteContent.about.galleryPhotos,
+    },
     services: partial.services ?? defaultSiteContent.services,
+    whyWorkWithMe: partial.whyWorkWithMe ?? defaultSiteContent.whyWorkWithMe,
+    developmentProcess:
+      partial.developmentProcess ?? defaultSiteContent.developmentProcess,
+    contactPage: {
+      ...defaultSiteContent.contactPage,
+      ...partial.contactPage,
+      getInTouch: {
+        ...defaultSiteContent.contactPage.getInTouch,
+        ...partial.contactPage?.getInTouch,
+      },
+      faq: {
+        ...defaultSiteContent.contactPage.faq,
+        ...partial.contactPage?.faq,
+      },
+    },
     portfolio: partial.portfolio ?? defaultSiteContent.portfolio,
     faq: partial.faq ?? defaultSiteContent.faq,
     testimonials: partial.testimonials ?? defaultSiteContent.testimonials,
     hero: { ...defaultSiteContent.hero, ...partial.hero },
+    home: {
+      ...defaultSiteContent.home,
+      ...partial.home,
+      stats: partial.home?.stats ?? defaultSiteContent.home.stats,
+      techStack: {
+        ...defaultSiteContent.home.techStack,
+        ...partial.home?.techStack,
+        items: sanitizeTechItems(
+          partial.home?.techStack?.items ??
+            defaultSiteContent.home.techStack.items
+        ),
+      },
+      servicesPreview: {
+        ...defaultSiteContent.home.servicesPreview,
+        ...partial.home?.servicesPreview,
+        items:
+          partial.home?.servicesPreview?.items ??
+          defaultSiteContent.home.servicesPreview.items,
+      },
+      whyChooseMe: {
+        ...defaultSiteContent.home.whyChooseMe,
+        ...partial.home?.whyChooseMe,
+        items:
+          partial.home?.whyChooseMe?.items ??
+          defaultSiteContent.home.whyChooseMe.items,
+      },
+      aboutIntro: {
+        ...defaultSiteContent.home.aboutIntro,
+        ...partial.home?.aboutIntro,
+        highlights:
+          partial.home?.aboutIntro?.highlights ??
+          defaultSiteContent.home.aboutIntro.highlights,
+        mainPhoto: {
+          ...defaultSiteContent.home.aboutIntro.mainPhoto,
+          ...partial.home?.aboutIntro?.mainPhoto,
+        },
+        accentPhoto1: {
+          ...defaultSiteContent.home.aboutIntro.accentPhoto1,
+          ...partial.home?.aboutIntro?.accentPhoto1,
+        },
+        accentPhoto2: {
+          ...defaultSiteContent.home.aboutIntro.accentPhoto2,
+          ...partial.home?.aboutIntro?.accentPhoto2,
+        },
+      },
+      cta: { ...defaultSiteContent.home.cta, ...partial.home?.cta },
+    },
   };
 }
 
-export async function getSiteContent(): Promise<SiteContent> {
+// Wrapped in React's `cache()` so that within a single request, every
+// section/component that calls getSiteContent() shares ONE Redis round-trip
+// instead of each firing its own — previously a single page (e.g. the
+// homepage, which pulls content in ~9 separate section components) made
+// 9+ sequential network calls to Upstash, which is what was making pages
+// slow. `cache()` de-dupes calls per request only; it doesn't cache across
+// different requests, so edits made in the admin panel still show up
+// immediately.
+export const getSiteContent = cache(async (): Promise<SiteContent> => {
   const raw = await kvGet<Partial<SiteContent> | null>(SITE_CONTENT_KEY, null);
   if (!raw) return defaultSiteContent;
   return mergeSiteContent(raw);
-}
+});
 
 export async function saveSiteContent(content: SiteContent): Promise<void> {
   await kvSet(SITE_CONTENT_KEY, content);
 }
 
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export const getBlogPosts = cache(async (): Promise<BlogPost[]> => {
   return kvGet(BLOG_POSTS_KEY, defaultBlogPosts);
-}
+});
 
 export async function getPublishedBlogPosts(): Promise<BlogPost[]> {
   const posts = await getBlogPosts();
@@ -192,10 +317,10 @@ export async function saveComment(
 
 // ---- Custom pages (admin-created pages from the dashboard) ----
 
-export async function getCustomPages() {
+export const getCustomPages = cache(async () => {
   const { defaultCustomPages } = await import("@/lib/default-content");
   return kvGet(PAGES_KEY, defaultCustomPages);
-}
+});
 
 export async function saveCustomPages(
   pages: Awaited<ReturnType<typeof getCustomPages>>

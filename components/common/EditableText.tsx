@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useEditMode } from "@/components/portal/AdminToolbar";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/utils/cn";

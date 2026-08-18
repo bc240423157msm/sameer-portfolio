@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import { SetupChecklist } from "@/components/portal/SetupChecklist";
 import { useRouter } from "next/navigation";
 import {
   LogOut,
@@ -86,7 +88,7 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/portal");
+    router.push("/");
     router.refresh();
   }
 
@@ -155,6 +157,8 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
           </button>
         </div>
       </header>
+
+      <SetupChecklist />
 
       <div className="mx-auto max-w-5xl px-6 py-8">
         {message && (
@@ -265,12 +269,12 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
             Change your username / password
           </h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            <input
-              type="password"
+            <PasswordInput
               value={accountForm.currentPassword}
-              onChange={(e) => setAccountForm({ ...accountForm, currentPassword: e.target.value })}
+              onChange={(v) => setAccountForm({ ...accountForm, currentPassword: v })}
               className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text-primary"
               placeholder="Current password"
+              autoComplete="current-password"
             />
             <input
               value={accountForm.newUsername}
@@ -278,10 +282,9 @@ export function SeoDashboard({ initialPosts }: SeoDashboardProps) {
               className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text-primary"
               placeholder="New username"
             />
-            <input
-              type="password"
+            <PasswordInput
               value={accountForm.newPassword}
-              onChange={(e) => setAccountForm({ ...accountForm, newPassword: e.target.value })}
+              onChange={(v) => setAccountForm({ ...accountForm, newPassword: v })}
               className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text-primary"
               placeholder="At least 6 characters"
             />

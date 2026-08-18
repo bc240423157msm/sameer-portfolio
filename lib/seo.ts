@@ -21,6 +21,12 @@ const defaultKeywords = [
   "Remote Web Developer",
   "Website Maintenance",
   "WooCommerce Developer",
+  "Software Engineer",
+  "Freelance Software Engineer",
+  "Software Engineer for Hire",
+  "Remote Software Engineer",
+  "Hire a Software Engineer",
+  "Software Developer",
 ];
 
 interface PageMetadataOptions {
@@ -36,10 +42,15 @@ interface PageMetadataOptions {
   image?: string;
 }
 
+function absoluteUrl(path = ""): string {
+  if (path.startsWith("http")) return path;
+  const baseUrl = siteConfig.url.replace(/\/+$/, "");
+  const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
+  return `${baseUrl}${normalizedPath}`;
+}
+
 function resolveImageUrl(image?: string): string | undefined {
-  if (!image) return `${siteConfig.url}/opengraph-image`;
-  if (image.startsWith("http")) return image;
-  return `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`;
+  return absoluteUrl(image ?? "/opengraph-image");
 }
 
 export function createPageMetadata({
@@ -53,7 +64,7 @@ export function createPageMetadata({
   modifiedTime,
   image,
 }: PageMetadataOptions): Metadata {
-  const url = `${siteConfig.url}${path}`;
+  const url = absoluteUrl(path);
   const fullTitle =
     path === "" ? siteConfig.title : `${title} | ${siteConfig.name}`;
   const ogImage = resolveImageUrl(image);
@@ -68,7 +79,10 @@ export function createPageMetadata({
     metadataBase: new URL(siteConfig.url),
     alternates: {
       canonical: url,
-      types: path === "/blog" ? { "application/rss+xml": `${siteConfig.url}/feed.xml` } : undefined,
+      types:
+        path === "/blog"
+          ? { "application/rss+xml": absoluteUrl("/feed.xml") }
+          : undefined,
     },
     openGraph: {
       title: fullTitle,
@@ -113,8 +127,8 @@ export function personJsonLd() {
     "@context": "https://schema.org",
     "@type": "Person",
     name: siteConfig.name,
-    url: siteConfig.url,
-    jobTitle: "Full Stack Web Developer & AI Automation Specialist",
+    url: absoluteUrl(),
+    jobTitle: "Software Engineer | Full Stack Web Developer & AI Automation Specialist",
     knowsAbout: [
       "Website Design",
       "Website Redesign",
@@ -123,6 +137,8 @@ export function personJsonLd() {
       "AI Chatbots",
       "React",
       "Next.js",
+      "Software Engineering",
+      "Software Development",
     ],
     sameAs: siteConfig.socialProfiles,
   };
@@ -133,7 +149,7 @@ export function websiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
-    url: siteConfig.url,
+    url: absoluteUrl(),
     description: siteConfig.description,
     inLanguage: "en-US",
     publisher: { "@type": "Person", name: siteConfig.name },
@@ -141,7 +157,7 @@ export function websiteJsonLd() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteConfig.url}/blog?q={search_term_string}`,
+        urlTemplate: absoluteUrl("/blog?q={search_term_string}"),
       },
       "query-input": "required name=search_term_string",
     },
@@ -152,8 +168,8 @@ export function professionalServiceJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    name: `${siteConfig.name} — Website Design & AI Automation`,
-    url: siteConfig.url,
+    name: `${siteConfig.name} - Website Design & AI Automation`,
+    url: absoluteUrl(),
     description: siteConfig.description,
     areaServed: "Worldwide",
     serviceType: [
@@ -163,6 +179,7 @@ export function professionalServiceJsonLd() {
       "WhatsApp Bot Development",
       "AI Chatbot Development",
       "E-commerce Development",
+      "Software Engineering",
     ],
   };
 }
@@ -175,7 +192,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: `${siteConfig.url}${item.path}`,
+      item: absoluteUrl(item.path),
     })),
   };
 }
@@ -198,7 +215,7 @@ export function articleJsonLd({
   const imageUrl = image
     ? image.startsWith("http")
       ? image
-      : `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`
+      : absoluteUrl(image)
     : undefined;
 
   return {
@@ -206,23 +223,23 @@ export function articleJsonLd({
     "@type": "BlogPosting",
     headline: title,
     description,
-    url: `${siteConfig.url}/blog/${slug}`,
+    url: absoluteUrl(`/blog/${slug}`),
     datePublished: publishedAt,
     dateModified: modifiedAt ?? publishedAt,
     ...(imageUrl ? { image: [imageUrl] } : {}),
     author: {
       "@type": "Person",
       name: siteConfig.name,
-      url: siteConfig.url,
+      url: absoluteUrl(),
     },
     publisher: {
       "@type": "Person",
       name: siteConfig.name,
-      url: siteConfig.url,
+      url: absoluteUrl(),
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${siteConfig.url}/blog/${slug}`,
+      "@id": absoluteUrl(`/blog/${slug}`),
     },
     inLanguage: "en-US",
   };
@@ -242,9 +259,9 @@ export function webPageJsonLd({
     "@type": "WebPage",
     name: title,
     description,
-    url: `${siteConfig.url}${path}`,
+    url: absoluteUrl(path),
     inLanguage: "en-US",
-    isPartOf: { "@type": "WebSite", url: siteConfig.url, name: siteConfig.name },
+    isPartOf: { "@type": "WebSite", url: absoluteUrl(), name: siteConfig.name },
   };
 }
 
@@ -274,13 +291,13 @@ export function blogListingJsonLd(
     "@context": "https://schema.org",
     "@type": "Blog",
     name: `${siteConfig.name} Blog`,
-    url: `${siteConfig.url}/blog`,
+    url: absoluteUrl("/blog"),
     description: "Web development, SEO, and automation insights.",
     blogPost: posts.slice(0, 10).map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       description: post.excerpt,
-      url: `${siteConfig.url}/blog/${post.slug}`,
+      url: absoluteUrl(`/blog/${post.slug}`),
       datePublished: post.createdAt,
     })),
   };
@@ -306,7 +323,7 @@ export function reviewsJsonLd(
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     name: siteConfig.name,
-    url: siteConfig.url,
+    url: absoluteUrl(),
     review: testimonials.map((t) => ({
       "@type": "Review",
       reviewBody: t.quote,

@@ -3,7 +3,6 @@
 import { Container } from "@/components/layout/Container";
 import { MotionReveal } from "@/components/common/MotionReveal";
 import { AnimatedCounter } from "@/components/common/AnimatedCounter";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 
 const stats = [
   { value: 3, suffix: "+", label: "Years Experience" },
