@@ -103,11 +103,11 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: [
         { url: "/favicon.ico", sizes: "any" },
         { url: "/logo.webp", type: "image/webp" },
-        { url: "/icon.svg", type: "image/svg+xml" },
-        { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-        { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+        { url: "/logo.webp", type: "image/webp" },
+        { url: "/logo.webp", sizes: "192x192", type: "image/webp" },
+        { url: "/logo.webp", sizes: "512x512", type: "image/webp" },
       ],
-      apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+      apple: [{ url: "/logo.webp", sizes: "180x180", type: "image/webp" }],
     },
     manifest: "/manifest.webmanifest",
   };
