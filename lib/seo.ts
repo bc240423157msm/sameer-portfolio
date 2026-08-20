@@ -315,24 +315,11 @@ export function faqJsonLd(items: { question: string; answer: string }[]) {
   };
 }
 
-export function reviewsJsonLd(
-  testimonials: { quote: string; author: string; rating: number }[]
-) {
-  if (testimonials.length === 0) return null;
-  return {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    name: siteConfig.name,
-    url: absoluteUrl(),
-    review: testimonials.map((t) => ({
-      "@type": "Review",
-      reviewBody: t.quote,
-      author: { "@type": "Person", name: t.author },
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: t.rating,
-        bestRating: 5,
-      },
-    })),
-  };
-}
+// NOTE: We intentionally do NOT emit Review/AggregateRating structured data
+// for the site owner's own ProfessionalService/Organization here. Google
+// treats reviews about an entity that are published on that same entity's
+// own site as "self-serving" and will never show review rich results for
+// them (LocalBusiness/Organization types), and Search Console will flag the
+// markup as invalid. Testimonials are still shown as regular HTML content
+// on the page — just without JSON-LD review markup.
+// Docs: https://developers.google.com/search/docs/appearance/structured-data/review-snippet#self-serving-reviews

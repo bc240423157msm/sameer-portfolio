@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { JsonLd } from "@/components/seo/JsonLd";
 import { MotionReveal } from "@/components/common/MotionReveal";
 import { TestimonialsGrid } from "@/components/sections/TestimonialsGrid";
 import { getSiteContent } from "@/lib/data";
 import { getTestimonialLikes } from "@/lib/testimonial-likes";
-import { reviewsJsonLd } from "@/lib/seo";
 
 export async function Testimonials() {
   const content = await getSiteContent();
@@ -15,11 +13,9 @@ export async function Testimonials() {
   if (testimonials.length === 0) return null;
 
   const likes = await getTestimonialLikes();
-  const reviewSchema = reviewsJsonLd(testimonials);
 
   return (
     <section className="border-y border-border/60 py-24">
-      {reviewSchema && <JsonLd data={reviewSchema} />}
       <Container>
         <MotionReveal>
           <SectionHeading
