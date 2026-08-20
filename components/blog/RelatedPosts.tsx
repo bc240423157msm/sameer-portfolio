@@ -9,9 +9,17 @@ interface RelatedPostsProps {
 }
 
 export function RelatedPosts({ posts, currentSlug }: RelatedPostsProps) {
-  const related = posts
-    .filter((p) => p.slug !== currentSlug && p.published)
-    .slice(0, 3);
+  const current = posts.find((p) => p.slug === currentSlug);
+  const others = posts.filter((p) => p.slug !== currentSlug && p.published);
+
+  // Prioritize posts in the same category (real relevance signal, better
+  // internal linking for SEO), then fill remaining slots with the most
+  // recent posts so there are always up to 3 shown.
+  const sameCategory = current
+    ? others.filter((p) => p.category === current.category)
+    : [];
+  const rest = others.filter((p) => !sameCategory.includes(p));
+  const related = [...sameCategory, ...rest].slice(0, 3);
 
   if (related.length === 0) return null;
 

@@ -204,6 +204,7 @@ export function articleJsonLd({
   publishedAt,
   modifiedAt,
   image,
+  keywords,
 }: {
   title: string;
   description: string;
@@ -211,6 +212,7 @@ export function articleJsonLd({
   publishedAt: string;
   modifiedAt?: string;
   image?: string;
+  keywords?: string[];
 }) {
   const imageUrl = image
     ? image.startsWith("http")
@@ -227,6 +229,7 @@ export function articleJsonLd({
     datePublished: publishedAt,
     dateModified: modifiedAt ?? publishedAt,
     ...(imageUrl ? { image: [imageUrl] } : {}),
+    ...(keywords && keywords.length > 0 ? { keywords: keywords.join(", ") } : {}),
     author: {
       "@type": "Person",
       name: siteConfig.name,
@@ -285,7 +288,13 @@ export function itemListJsonLd(
 }
 
 export function blogListingJsonLd(
-  posts: { title: string; slug: string; excerpt: string; createdAt: string }[]
+  posts: {
+    title: string;
+    slug: string;
+    excerpt: string;
+    createdAt: string;
+    focusKeyword?: string;
+  }[]
 ) {
   return {
     "@context": "https://schema.org",
@@ -299,6 +308,7 @@ export function blogListingJsonLd(
       description: post.excerpt,
       url: absoluteUrl(`/blog/${post.slug}`),
       datePublished: post.createdAt,
+      ...(post.focusKeyword ? { keywords: post.focusKeyword } : {}),
     })),
   };
 }

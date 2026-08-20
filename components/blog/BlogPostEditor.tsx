@@ -6,7 +6,8 @@ import type { BlogPost } from "@/types/content";
 import { RichTextEditor } from "@/components/blog/RichTextEditor";
 import { ImageUploader } from "@/components/portal/ImageUploader";
 import { readingTimeMinutes } from "@/lib/blog-html";
-import { checkFocusKeyword, metaDescriptionStatus } from "@/lib/blog-seo";
+import { checkFocusKeyword, metaDescriptionStatus, parseKeywordTags, stringifyKeywordTags } from "@/lib/blog-seo";
+import { TagInput } from "@/components/ui/TagInput";
 import { slugify } from "@/utils/slugify";
 import { cn } from "@/utils/cn";
 import type { BlogDraft } from "@/lib/blog-drafts";
@@ -77,7 +78,8 @@ export function BlogPostEditor({
 
   const readingTime = readingTimeMinutes(value.content);
   const metaStatus = metaDescriptionStatus(value.excerpt);
-  const keywordCheck = checkFocusKeyword(value.focusKeyword, {
+  const keywordTags = parseKeywordTags(value.focusKeyword);
+  const keywordCheck = checkFocusKeyword(keywordTags, {
     title: value.title,
     excerpt: value.excerpt,
     contentHtml: value.content,
@@ -220,20 +222,22 @@ export function BlogPostEditor({
 
       <div>
         <label className="mb-1 block text-xs text-text-muted">
-          Focus keyword (optional)
+          Focus keywords (optional) — press Enter after each one
         </label>
-        <input
-          value={value.focusKeyword}
-          onChange={(e) => update({ focusKeyword: e.target.value })}
-          className={inputClass}
-          placeholder="e.g. Next.js SEO"
+        <TagInput
+          value={keywordTags}
+          onChange={(tags) => update({ focusKeyword: stringifyKeywordTags(tags) })}
+          placeholder="e.g. WordPress developer, then press Enter"
         />
+        <p className="mt-1 text-xs text-text-muted">
+          Add the exact phrases people search for on Google — one tag per phrase. Up to 8.
+        </p>
         {keywordCheck && (
           <ul className="mt-2 space-y-1 text-xs text-text-secondary">
-            <KeywordRow ok={keywordCheck.inTitle} label="Keyword in title" />
-            <KeywordRow ok={keywordCheck.inFirstParagraph} label="Keyword in first paragraph" />
-            <KeywordRow ok={keywordCheck.inH2} label="Keyword in at least one H2" />
-            <KeywordRow ok={keywordCheck.inMetaDescription} label="Keyword in meta description" />
+            <KeywordRow ok={keywordCheck.inTitle} label="A keyword appears in the title" />
+            <KeywordRow ok={keywordCheck.inFirstParagraph} label="A keyword appears in the first paragraph" />
+            <KeywordRow ok={keywordCheck.inH2} label="A keyword appears in at least one H2" />
+            <KeywordRow ok={keywordCheck.inMetaDescription} label="A keyword appears in the meta description" />
           </ul>
         )}
       </div>

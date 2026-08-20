@@ -41,7 +41,17 @@ describe("blog-seo", () => {
   });
 
   it("checks focus keyword placement", () => {
-    const result = checkFocusKeyword("nextjs", {
+    const result = checkFocusKeyword(["nextjs"], {
+      title: "Building with Next.js",
+      excerpt: "A guide to Next.js SEO",
+      contentHtml: "<p>Intro about Next.js</p><h2>Why Next.js rocks</h2>",
+    });
+    expect(result?.inTitle).toBe(true);
+    expect(result?.inH2).toBe(true);
+  });
+
+  it("matches if ANY of multiple keyword tags is found", () => {
+    const result = checkFocusKeyword(["wordpress developer", "nextjs"], {
       title: "Building with Next.js",
       excerpt: "A guide to Next.js SEO",
       contentHtml: "<p>Intro about Next.js</p><h2>Why Next.js rocks</h2>",

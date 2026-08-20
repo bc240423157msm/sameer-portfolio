@@ -35,9 +35,12 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     path: `/blog/${post.slug}`,
-    keywords: [post.category, post.focusKeyword, "Web Development", "SEO"].filter(
-      Boolean
-    ) as string[],
+    keywords: [
+      post.category,
+      ...post.focusKeyword?.split(",").map((k) => k.trim()).filter(Boolean) ?? [],
+      "Web Development",
+      "SEO",
+    ].filter(Boolean) as string[],
     type: "article",
     publishedTime: post.createdAt,
     modifiedTime: post.updatedAt,
@@ -72,6 +75,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             publishedAt: post.createdAt,
             modifiedAt: post.updatedAt,
             image: post.coverImage,
+            keywords: post.focusKeyword
+              ?.split(",")
+              .map((k) => k.trim())
+              .filter(Boolean),
           }),
         ]}
       />

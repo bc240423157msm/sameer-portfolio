@@ -32,9 +32,12 @@ function extFromType(type: string) {
   );
 }
 
-async function requireAdmin() {
+// Both admin and seo roles may upload images — seo needs this for blog cover
+// images and in-post images. Homepage/site content stays admin-only (see
+// app/api/content routes), so this doesn't widen what seo can actually change.
+async function requireUploader() {
   const session = await getSession();
-  if (!session || session.role !== "admin") return false;
+  if (!session || (session.role !== "admin" && session.role !== "seo")) return false;
   return true;
 }
 
@@ -42,7 +45,7 @@ async function requireAdmin() {
  * means the admin form swaps the stored URL for the new one; the old file
  * (if it was itself a managed upload) is removed via DELETE from the client. */
 export async function POST(request: Request) {
-  if (!(await requireAdmin())) {
+  if (!(await requireUploader())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
@@ -91,7 +94,7 @@ export async function POST(request: Request) {
  * (Blob URLs on our store, or local /uploads/ paths) can be removed this way —
  * anything else (external URLs, /logo.webp, etc.) is left alone. */
 export async function DELETE(request: Request) {
-  if (!(await requireAdmin())) {
+  if (!(await requireUploader())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
