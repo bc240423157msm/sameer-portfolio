@@ -2,10 +2,9 @@ import type { NavLink, SiteConfig, SocialLink } from "@/types";
 
 export const siteConfig: SiteConfig = {
   name: "Sameer Malik",
-  title:
-    "Sameer Malik | Software Engineer & Website Design, WordPress, WhatsApp Bot Developer",
+  title: "Sameer Malik | Web, WordPress & WhatsApp Bot Developer",
   description:
-    "Sameer Malik is a software engineer offering professional website design, website redesign, WordPress development, AI chatbots, and WhatsApp bot development for startups, agencies, and businesses worldwide.",
+    "Sameer Malik is a software engineer offering professional website design, WordPress development, AI chatbots, and WhatsApp bot development for businesses worldwide.",
   url: "https://sameermalik.dev",
   bookingUrl: "https://calendly.com/sameer03238867440/30min",
   socialProfiles: [

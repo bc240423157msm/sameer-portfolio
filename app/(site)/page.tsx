@@ -33,7 +33,7 @@ const WhyChooseMeWrapper = dynamic(() =>
 export const metadata = createPageMetadata({
   title: "Home",
   description:
-    "Professional website design, website redesign, WordPress development, WhatsApp bot & AI chatbot development. Sameer Malik is a software engineer building fast, SEO-friendly websites for businesses worldwide.",
+    "Sameer Malik is a software engineer building fast, SEO-friendly websites, WordPress sites, WhatsApp bots, and AI chatbots for businesses worldwide.",
   path: "",
   keywords: [
     "Website Design",
