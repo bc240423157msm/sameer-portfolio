@@ -9,7 +9,7 @@ import { breadcrumbJsonLd, createPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = createPageMetadata({
   title: "About",
   description:
-    "Learn about Sameer Malik — software engineer specializing in website design, website redesign, WordPress, WhatsApp bot & AI chatbot development for international clients.",
+    "Learn about Sameer Malik — software engineer specializing in website design, WordPress, WhatsApp bots & AI chatbots for international clients.",
   path: "/about",
   keywords: [
     "Website Design",

@@ -11,7 +11,7 @@ import { siteConfig } from "@/lib/site-config";
 export const metadata: Metadata = createPageMetadata({
   title: "Services",
   description:
-    "Custom web development, AI chatbots, WhatsApp automation, and WordPress & WooCommerce services. React, Next.js, and SEO-friendly websites for startups and businesses.",
+    "Custom web development, AI chatbots, WhatsApp automation, and WordPress & WooCommerce services. React & Next.js websites for startups and businesses.",
   path: "/services",
   keywords: [
     "WooCommerce Developer",
