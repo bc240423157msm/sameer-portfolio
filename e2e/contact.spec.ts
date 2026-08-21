@@ -11,7 +11,9 @@ test.describe("Contact form", () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.getByText("Message sent!")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Message sent!" })).toBeVisible({
+      timeout: 10000,
+    });
   });
 });
 
@@ -26,7 +28,7 @@ test.describe("Admin login", () => {
   test("shows login form", async ({ page }) => {
     await page.goto("/portal");
     await expect(page.getByLabel(/username/i)).toBeVisible();
-    await expect(page.getByLabel(/password/i)).toBeVisible();
+    await expect(page.locator("#password")).toBeVisible();
   });
 
   test("logs in with valid credentials", async ({ page }) => {
