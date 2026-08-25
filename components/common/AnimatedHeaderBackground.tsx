@@ -19,8 +19,10 @@ const PARTICLE_COLORS = [
   "251, 191, 36", // --color-accent (gold)
 ];
 
-const MAX_PARTICLES = 90;
+const MAX_PARTICLES_DESKTOP = 90;
+const MAX_PARTICLES_MOBILE = 28;
 const LINK_DISTANCE = 130;
+const MOBILE_BREAKPOINT = 768;
 
 interface AnimatedHeaderBackgroundProps {
   className?: string;
@@ -54,12 +56,16 @@ export function AnimatedHeaderBackground({
     let dpr = 1;
     let animationFrame = 0;
     let running = true;
+    let isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
     function resize() {
       const canvasEl = canvasRef.current;
       const parent = canvasEl?.parentElement;
       if (!canvasEl || !ctx || !parent) return;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+      // Cap DPR at 1 on mobile — rendering at 2x pixel density on a busy
+      // particle canvas is a common cause of jank on mid/low-end phones.
+      dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2);
       width = parent.clientWidth;
       height = parent.clientHeight;
       canvasEl.width = width * dpr;
@@ -68,9 +74,10 @@ export function AnimatedHeaderBackground({
       canvasEl.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+      const maxParticles = isMobile ? MAX_PARTICLES_MOBILE : MAX_PARTICLES_DESKTOP;
       const count = Math.min(
-        MAX_PARTICLES,
-        Math.round((width * height) / 14000)
+        maxParticles,
+        Math.round((width * height) / (isMobile ? 22000 : 14000))
       );
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * width,
@@ -104,20 +111,26 @@ export function AnimatedHeaderBackground({
         if (p.y <= 0 || p.y >= height) p.vy *= -1;
       }
 
-      for (let i = 0; i < particles.length; i++) {
-        const a = particles[i]!;
-        for (let j = i + 1; j < particles.length; j++) {
-          const b = particles[j]!;
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < LINK_DISTANCE) {
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(16, 185, 129, ${0.18 * (1 - dist / LINK_DISTANCE)})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
+      // The pairwise distance check below is O(n^2) — with fewer mobile
+      // particles it's cheap, but the line-drawing itself (separate stroke
+      // calls) is still the priciest part of the frame on phone GPUs, so we
+      // skip it there entirely and just show the dots.
+      if (!isMobile) {
+        for (let i = 0; i < particles.length; i++) {
+          const a = particles[i]!;
+          for (let j = i + 1; j < particles.length; j++) {
+            const b = particles[j]!;
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < LINK_DISTANCE) {
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.strokeStyle = `rgba(16, 185, 129, ${0.18 * (1 - dist / LINK_DISTANCE)})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -175,17 +188,20 @@ export function AnimatedHeaderBackground({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_color-mix(in_srgb,var(--color-primary)_14%,transparent),transparent_65%)]" />
 
       <motion.div
-        className="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-primary/20 blur-[110px]"
+        className="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-primary/20 blur-[60px] md:blur-[110px]"
         animate={{ opacity: [0.3, 0.6, 0.3], x: [0, 30, 0], y: [0, -20, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute -right-16 top-0 h-80 w-80 rounded-full bg-accent/15 blur-[120px]"
+        className="absolute -right-16 top-0 h-80 w-80 rounded-full bg-accent/15 blur-[65px] md:blur-[120px]"
         animate={{ opacity: [0.25, 0.55, 0.25], x: [0, -25, 0], y: [0, 25, 0] }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
+      {/* Third blob is desktop-only — three simultaneous large-blur, infinitely
+          animating layers is the main cause of mobile jank; two lighter ones
+          keep the effect without the cost. */}
       <motion.div
-        className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-secondary/15 blur-[100px]"
+        className="absolute bottom-0 left-1/3 hidden h-64 w-64 rounded-full bg-secondary/15 blur-[100px] md:block"
         animate={{ opacity: [0.2, 0.5, 0.2], x: [0, 20, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       />

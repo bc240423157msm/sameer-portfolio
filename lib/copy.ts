@@ -2,7 +2,7 @@ export const aboutCopy = {
   personalStory: `I'm Sameer Malik, a Full Stack Web Developer and AI Automation Specialist working with clients around the world. What started as curiosity about how websites and apps actually work turned into a genuine passion for building tools that solve real business problems.
 
 Today, I help startups, agencies, and small businesses ship faster websites, smarter automation, and better customer experiences — without the headaches that usually come with hiring a developer.`,
-  experience: `I currently work as a Frontend Developer Intern at PascalineSoft, where I contribute to real client projects including company websites and WordPress e-commerce builds. This hands-on experience, combined with my freelance work, has given me a practical understanding of what businesses actually need — not just what looks good in a portfolio.`,
+  experience: `I currently work as a Frontend Developer at PascalineSoft, where I contribute to real client projects including company websites and WordPress e-commerce builds. This hands-on experience, combined with my freelance work, has given me a practical understanding of what businesses actually need — not just what looks good in a portfolio.`,
   education: `I'm pursuing a Bachelor of Science in Computer Science (BSCS), which keeps my fundamentals sharp while I apply modern frameworks and tools in production.`,
   skills: [
     "Website Design",

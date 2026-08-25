@@ -256,6 +256,7 @@ body {
   height: 100%;
   transform-style: preserve-3d;
   animation: hero-cube-spin 18s linear infinite;
+  will-change: transform;
 }
 
 .hero-cube-face {
@@ -264,6 +265,20 @@ body {
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, transparent);
   backdrop-filter: blur(2px);
+}
+
+/* backdrop-filter recomputed every frame on a continuously-rotating 3D
+   transform is the single most expensive part of this component on phone
+   GPUs — the visual difference is negligible, so drop it below 768px. */
+@media (max-width: 767px) {
+  .hero-cube-scene {
+    width: 150px;
+    height: 150px;
+  }
+
+  .hero-cube-face {
+    backdrop-filter: none;
+  }
 }
 
 .hero-cube-face--front {
