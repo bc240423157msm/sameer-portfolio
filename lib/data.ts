@@ -147,9 +147,17 @@ function mergeSiteContent(partial: Partial<SiteContent>): SiteContent {
       },
     },
     portfolio: (partial.portfolio ?? defaultSiteContent.portfolio).map(
-      (project, index) => {
-        const fallback =
-          defaultSiteContent.portfolio[index]?.image ?? project.image;
+      (project) => {
+        // Match by slug, not array position — if the admin has reordered,
+        // added, or removed projects, the live array's length/order no
+        // longer lines up with defaultSiteContent.portfolio's, so matching
+        // by index here silently pairs a project with a DIFFERENT project's
+        // image (or falls through to the site logo). Slug is stable across
+        // reorders/edits, so it's the correct join key.
+        const defaultMatch = defaultSiteContent.portfolio.find(
+          (d) => d.slug === project.slug
+        );
+        const fallback = defaultMatch?.image ?? project.image;
         return {
           ...project,
           image: resolveImageSrc(project.image, fallback),

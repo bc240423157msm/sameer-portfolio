@@ -59,6 +59,11 @@ export default async function PortfolioPage() {
 
                   <div className="grid gap-8 p-8 lg:grid-cols-2 lg:p-10">
                     <div>
+                      {project.role && (
+                        <p className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-surface/60 px-3 py-1 text-xs font-medium text-text-secondary">
+                          {project.role}
+                        </p>
+                      )}
                       <h3 className="text-sm font-medium uppercase tracking-wider text-accent">
                         Overview
                       </h3>

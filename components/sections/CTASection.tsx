@@ -55,8 +55,7 @@ export function CTASection({
                   </Button>
                 ) : (
                   <Button href="/contact" variant="secondary" size="lg">
-                    <Calendar className="h-4 w-4" />
-                    Schedule a Call
+                    Discuss Your Project
                   </Button>
                 )}
               </div>

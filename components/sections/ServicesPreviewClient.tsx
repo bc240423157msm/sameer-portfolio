@@ -83,6 +83,16 @@ export function ServicesPreviewClient({
             </StaggerItem>
           ))}
         </StaggerContainer>
+
+        <MotionReveal className="mt-12 flex justify-center" delay={0.1}>
+          <Link
+            href="/services"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+          >
+            View All Services
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </MotionReveal>
       </Container>
     </section>
   );

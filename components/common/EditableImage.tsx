@@ -7,7 +7,7 @@ import { Camera } from "lucide-react";
 import { useEditMode } from "@/components/portal/AdminToolbar";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/utils/cn";
-import { isLocalPublicImage, resolveImageSrc } from "@/lib/image-src";
+import { resolveImageSrc } from "@/lib/image-src";
 
 // ImageUploader (drag-drop handling, upload API calls, preview UI) is only
 // ever needed by a logged-in admin who opens the picker — regular visitors
@@ -108,7 +108,6 @@ export function EditableImage({
           width={!fill ? width : undefined}
           height={!fill ? height : undefined}
           sizes={sizes}
-          unoptimized={isLocalPublicImage(currentSrc)}
           className="object-cover"
           data-cursor="view"
           onError={() => {

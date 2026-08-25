@@ -473,6 +473,7 @@ export function AdminDashboard({
           problem: "",
           solution: "",
           results: "",
+          role: "",
           projectUrl: "",
           image: "",
         },
@@ -1219,6 +1220,12 @@ export function AdminDashboard({
                 <h2 className="mb-3 font-semibold text-text-primary">Service: {service.title}</h2>
                 <input value={service.title} onChange={(e) => { const s = [...content.services]; s[i] = { ...s[i]!, title: e.target.value }; setContent({ ...content, services: s }); }} className={`${inputClass} mb-3`} />
                 <textarea value={service.shortDescription} onChange={(e) => { const s = [...content.services]; s[i] = { ...s[i]!, shortDescription: e.target.value }; setContent({ ...content, services: s }); }} rows={3} className={textareaClass} />
+                <input
+                  value={service.startingPrice}
+                  onChange={(e) => { const s = [...content.services]; s[i] = { ...s[i]!, startingPrice: e.target.value }; setContent({ ...content, services: s }); }}
+                  className={`${inputClass} mt-3`}
+                  placeholder='Pricing (e.g. "Starting from $299" or "Custom quote — message me to discuss")'
+                />
               </div>
             ))}
 
@@ -1402,6 +1409,12 @@ export function AdminDashboard({
                       <input value={project.subtitle} onChange={(e) => { const p = [...content.portfolio]; p[i] = { ...p[i]!, subtitle: e.target.value }; setContent({ ...content, portfolio: p }); }} className={inputClass} placeholder="Subtitle" />
                       <input value={project.projectUrl} onChange={(e) => { const p = [...content.portfolio]; p[i] = { ...p[i]!, projectUrl: e.target.value }; setContent({ ...content, portfolio: p }); }} className={inputClass} placeholder="Live URL (https://...)" />
                     </div>
+                    <input
+                      value={project.role}
+                      onChange={(e) => { const p = [...content.portfolio]; p[i] = { ...p[i]!, role: e.target.value }; setContent({ ...content, portfolio: p }); }}
+                      className={inputClass}
+                      placeholder='Your role (e.g. "Developed while working at PascalineSoft" or "Freelance project — independent client")'
+                    />
                     <textarea value={project.description} onChange={(e) => { const p = [...content.portfolio]; p[i] = { ...p[i]!, description: e.target.value }; setContent({ ...content, portfolio: p }); }} rows={2} className={textareaClass} placeholder="Short description (used for SEO/cards)" />
                     <textarea value={project.overview} onChange={(e) => { const p = [...content.portfolio]; p[i] = { ...p[i]!, overview: e.target.value }; setContent({ ...content, portfolio: p }); }} rows={2} className={textareaClass} placeholder="Overview" />
                     <textarea value={project.problem} onChange={(e) => { const p = [...content.portfolio]; p[i] = { ...p[i]!, problem: e.target.value }; setContent({ ...content, portfolio: p }); }} rows={2} className={textareaClass} placeholder="The Challenge / Problem" />

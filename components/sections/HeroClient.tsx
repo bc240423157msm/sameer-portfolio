@@ -12,11 +12,7 @@ import { SpotlightReveal, useSpotlightHandlers } from "@/components/common/Spotl
 import { EditableText } from "@/components/common/EditableText";
 import type { HeaderImage } from "@/lib/page-headers";
 import type { SiteBranding } from "@/types/content";
-import {
-  DEFAULT_LOGO,
-  isLocalPublicImage,
-  resolveImageSrc,
-} from "@/lib/image-src";
+import { DEFAULT_LOGO, resolveImageSrc } from "@/lib/image-src";
 
 interface HeroClientProps {
   hero: {
@@ -51,7 +47,6 @@ export function HeroClient({ hero, headerImage, branding }: HeroClientProps) {
         fill
         priority
         quality={80}
-        unoptimized={isLocalPublicImage(heroImageSrc)}
         className="object-cover object-center"
         sizes="100vw"
         onError={() => {
@@ -137,7 +132,6 @@ export function HeroClient({ hero, headerImage, branding }: HeroClientProps) {
                   alt={branding.logoAlt}
                   width={20}
                   height={20}
-                  unoptimized={isLocalPublicImage(logoSrc)}
                   className="h-5 w-5"
                   onError={() => {
                     if (logoSrc !== DEFAULT_LOGO) setLogoSrc(DEFAULT_LOGO);

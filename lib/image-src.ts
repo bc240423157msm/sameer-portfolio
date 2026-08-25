@@ -40,7 +40,7 @@ export function resolveOptionalImageSrc(
   return resolveImageSrc(src);
 }
 
-/** True for paths served directly from /public (skip the image optimizer). */
+/** True for paths served directly from /public. */
 export function isLocalPublicImage(src: string): boolean {
   return src.startsWith("/") && !src.startsWith("//");
 }

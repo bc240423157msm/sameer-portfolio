@@ -3,6 +3,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@fontsource-variable/inter/standard.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { PageLoader } from "@/components/common/PageLoader";
+import { CookieConsent } from "@/components/common/CookieConsent";
 import {
   personJsonLd,
   professionalServiceJsonLd,
@@ -151,7 +153,9 @@ export default async function RootLayout({
         <JsonLd
           data={[personJsonLd(), websiteJsonLd(), professionalServiceJsonLd()]}
         />
+        <PageLoader />
         {children}
+        <CookieConsent />
         <Analytics />
         <SpeedInsights />
       </body>

@@ -3,11 +3,7 @@
 import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
-import {
-  DEFAULT_LOGO,
-  isLocalPublicImage,
-  resolveImageSrc,
-} from "@/lib/image-src";
+import { DEFAULT_LOGO, resolveImageSrc } from "@/lib/image-src";
 
 interface ImageSpotlightProps {
   src: string;
@@ -69,7 +65,8 @@ export function ImageSpotlight({
     <div
       ref={ref}
       className={cn(
-        "group/spotlight relative overflow-hidden",
+        "group/spotlight overflow-hidden",
+        fill ? "absolute inset-0" : "relative",
         onClick && "cursor-pointer",
         className
       )}
@@ -86,7 +83,6 @@ export function ImageSpotlight({
         height={!fill ? height : undefined}
         sizes={sizes}
         priority={priority}
-        unoptimized={isLocalPublicImage(currentSrc)}
         className={cn(
           "object-cover transition-[transform,filter] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/spotlight:scale-[1.03] group-hover/spotlight:brightness-110",
           imageClassName

@@ -282,6 +282,8 @@ export interface SiteContent {
     features: string[];
     technologies: string[];
     iconKey: string;
+    /** e.g. "Starting from $299" or "Custom quote — let's discuss your project". Shown on the Services page. */
+    startingPrice: string;
   }[];
   /** "Why Work With Me" cards on the Services page. */
   whyWorkWithMe: { id: string; title: string; description: string }[];
@@ -301,6 +303,8 @@ export interface SiteContent {
     projectUrl: string;
     /** Project screenshot. Editable in Admin Dashboard > Portfolio. */
     image: string;
+    /** How this project relates to the developer, e.g. "Developed while working at PascalineSoft" or "Freelance project — independent client". Shown on the portfolio page for transparency. */
+    role: string;
   }[];
   faq: { question: string; answer: string }[];
   testimonials: Testimonial[];

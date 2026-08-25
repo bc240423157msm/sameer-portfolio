@@ -15,12 +15,12 @@ import { footerLinks, navLinks } from "@/lib/site-config";
 // dedicated screenshot yet still fall back to a stock Unsplash image below —
 // drop the real file into /public and add it here to replace it.
 const caseStudyImages: Record<string, string> = {
-  furniflair: "/furniflair-screenshot.png",
+  furniflair: "/furniflair-screenshot.webp",
   "ai-whatsapp-bot": "/whatsapp_bot.webp",
-  pascalinesoft: "/pascalinesoft-screenshot.png",
-  "pascalinesoft-uk": "/pascalinesoft-screenshot.png",
+  pascalinesoft: "/pascalinesoft-screenshot.webp",
+  "pascalinesoft-uk": "/pascalinesoft-screenshot.webp",
   "whatsapp-auto-chat": "/whatsappchatbot.webp",
-  "ubqari-trust": "/ubqari-screenshot.png",
+  "ubqari-trust": "/ubqari-screenshot.webp",
   pureworkathletics:
     "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=1200&q=80&auto=format&fit=crop",
 };
@@ -136,6 +136,7 @@ export const defaultSiteContent: SiteContent = {
     problem: cs.problem,
     solution: cs.solution,
     results: cs.results,
+    role: cs.role,
     projectUrl: caseStudyUrls[cs.slug] ?? "",
     image:
       caseStudyImages[cs.slug] ??

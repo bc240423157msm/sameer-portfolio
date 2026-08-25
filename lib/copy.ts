@@ -49,6 +49,7 @@ export const servicesCopy = [
     ],
     technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Node.js"],
     iconKey: "globe",
+    startingPrice: "Custom quote — message me to discuss your project",
   },
   {
     id: "ai-automation",
@@ -58,12 +59,14 @@ export const servicesCopy = [
     features: [
       "AI Chatbots",
       "WhatsApp Bots",
+      "WhatsApp Group Management Bots",
       "Customer Support Automation",
       "Workflow Automation",
       "Business Process Automation",
     ],
     technologies: ["Node.js", "OpenAI API", "WhatsApp API", "REST APIs"],
     iconKey: "bot",
+    startingPrice: "Custom quote — message me to discuss your project",
   },
   {
     id: "wordpress",
@@ -81,6 +84,7 @@ export const servicesCopy = [
     ],
     technologies: ["WordPress", "WooCommerce", "PHP", "MySQL"],
     iconKey: "shopping-cart",
+    startingPrice: "Custom quote — message me to discuss your project",
   },
   {
     id: "figma-design",
@@ -96,6 +100,7 @@ export const servicesCopy = [
     ],
     technologies: ["Figma", "UI/UX Design", "Prototyping"],
     iconKey: "pen-tool",
+    startingPrice: "Custom quote — message me to discuss your project",
   },
   {
     id: "social-media-marketing",
@@ -111,6 +116,7 @@ export const servicesCopy = [
     ],
     technologies: ["Meta Ads", "Instagram", "Facebook", "Content Strategy"],
     iconKey: "trending-up",
+    startingPrice: "Custom quote — message me to discuss your project",
   },
   {
     id: "seo",
@@ -126,37 +132,15 @@ export const servicesCopy = [
     ],
     technologies: ["Google Search Console", "Google Analytics", "Technical SEO"],
     iconKey: "search",
+    startingPrice: "Custom quote — message me to discuss your project",
   },
 ];
 
 export const caseStudies = [
   {
-    slug: "furniflair",
-    title: "Furniflair.com",
-    overview:
-      "A modern furniture business website designed to showcase products with a clean, premium feel and smooth browsing experience.",
-    problem:
-      "The client needed a professional online presence that reflected the quality of their furniture — something fast, mobile-friendly, and easy to navigate without overwhelming visitors.",
-    solution:
-      "I designed and developed a responsive website with a clean UI, optimized performance, and an intuitive layout that guides visitors from browsing to inquiry.",
-    technologies: ["HTML5", "CSS3", "JavaScript", "Responsive Design"],
-    features: [
-      "Clean, modern UI design",
-      "Fully responsive layout",
-      "Performance-optimized assets",
-      "SEO-friendly structure",
-      "Improved user experience",
-    ],
-    challenges:
-      "Balancing visual richness with fast load times on mobile devices, while keeping the design minimal enough to let product imagery stand out.",
-    results:
-      "A polished business website that loads quickly, works across all devices, and gives the brand a credible, professional online presence.",
-    clientValue:
-      "The client gained a website that builds trust with potential customers and supports their growth without requiring constant technical maintenance.",
-  },
-  {
     slug: "ai-whatsapp-bot",
     title: "AI WhatsApp Bot",
+    role: "Independent project — built for university student groups",
     overview:
       "An intelligent WhatsApp automation system built for students to streamline communication and resource sharing.",
     problem:
@@ -181,8 +165,82 @@ export const caseStudies = [
       "Users get faster access to information and materials, while administrators save hours every week on repetitive communication tasks.",
   },
   {
+    slug: "whatsapp-auto-chat",
+    title: "WhatsApp Auto Chat",
+    role: "Freelance project — independent client",
+    overview:
+      "A general-purpose WhatsApp auto-reply and chat automation system for businesses that need instant responses outside the university-group use case.",
+    problem:
+      "Businesses were losing leads because nobody could reply to WhatsApp messages instantly, especially outside working hours.",
+    solution:
+      "I built an automated WhatsApp chat flow that greets new messages, answers common questions, and routes anything complex to a human — running around the clock.",
+    technologies: ["Node.js", "WhatsApp API", "Automation"],
+    features: [
+      "Instant auto-replies",
+      "Business-hours aware routing",
+      "FAQ handling",
+      "Lead capture",
+    ],
+    challenges:
+      "Making automated replies feel natural and helpful rather than robotic, while still escalating to a human at the right moment.",
+    results:
+      "Faster first-response times and no more missed leads outside business hours.",
+    clientValue:
+      "The client's WhatsApp line now responds instantly to every message, improving customer experience and conversion.",
+  },
+  {
+    slug: "furniflair",
+    title: "Furniflair.com",
+    role: "Freelance project — independent client",
+    overview:
+      "A modern furniture business website designed to showcase products with a clean, premium feel and smooth browsing experience.",
+    problem:
+      "The client needed a professional online presence that reflected the quality of their furniture — something fast, mobile-friendly, and easy to navigate without overwhelming visitors.",
+    solution:
+      "I designed and developed a responsive website with a clean UI, optimized performance, and an intuitive layout that guides visitors from browsing to inquiry.",
+    technologies: ["HTML5", "CSS3", "JavaScript", "Responsive Design"],
+    features: [
+      "Clean, modern UI design",
+      "Fully responsive layout",
+      "Performance-optimized assets",
+      "SEO-friendly structure",
+      "Improved user experience",
+    ],
+    challenges:
+      "Balancing visual richness with fast load times on mobile devices, while keeping the design minimal enough to let product imagery stand out.",
+    results:
+      "A polished business website that loads quickly, works across all devices, and gives the brand a credible, professional online presence.",
+    clientValue:
+      "The client gained a website that builds trust with potential customers and supports their growth without requiring constant technical maintenance.",
+  },
+  {
+    slug: "pureworkathletics",
+    title: "PureWork Athletics",
+    role: "Freelance project — independent client",
+    overview:
+      "A sports training website for a private basketball coaching program associated with NBA-level trainers, including session booking information.",
+    problem:
+      "The client needed a professional site that reflects an elite training brand and makes it simple for athletes to learn about programs and inquire about sessions.",
+    solution:
+      "I built a polished, athletic-brand website with program details, trainer bios, and a clear contact path for booking inquiries.",
+    technologies: ["React", "Responsive Design", "SEO"],
+    features: [
+      "Trainer & program profiles",
+      "Session info & pricing layout",
+      "Contact-driven booking flow",
+      "Mobile-first responsive design",
+    ],
+    challenges:
+      "Balancing a bold, athletic visual identity with clear, scannable information about programs and pricing.",
+    results:
+      "A professional site that reflects the caliber of the training program and converts visitors into inquiries.",
+    clientValue:
+      "The client now has a credible online presence that matches the elite level of their coaching brand.",
+  },
+  {
     slug: "pascalinesoft",
     title: "PascalineSoft Website",
+    role: "Developed while working at PascalineSoft",
     overview:
       "A professional company website and WordPress e-commerce build for PascalineSoft, a software development company.",
     problem:
@@ -207,6 +265,7 @@ export const caseStudies = [
   {
     slug: "pascalinesoft-uk",
     title: "PascalineSoft UK",
+    role: "Developed while working at PascalineSoft",
     overview:
       "The UK-facing counterpart of the PascalineSoft company website, built to present the same brand and services to a British audience.",
     problem:
@@ -228,33 +287,11 @@ export const caseStudies = [
       "PascalineSoft can now speak directly to UK clients with localized messaging under its own domain.",
   },
   {
-    slug: "whatsapp-auto-chat",
-    title: "WhatsApp Auto Chat",
-    overview:
-      "A general-purpose WhatsApp auto-reply and chat automation system for businesses that need instant responses outside the university-group use case.",
-    problem:
-      "Businesses were losing leads because nobody could reply to WhatsApp messages instantly, especially outside working hours.",
-    solution:
-      "I built an automated WhatsApp chat flow that greets new messages, answers common questions, and routes anything complex to a human — running around the clock.",
-    technologies: ["Node.js", "WhatsApp API", "Automation"],
-    features: [
-      "Instant auto-replies",
-      "Business-hours aware routing",
-      "FAQ handling",
-      "Lead capture",
-    ],
-    challenges:
-      "Making automated replies feel natural and helpful rather than robotic, while still escalating to a human at the right moment.",
-    results:
-      "Faster first-response times and no more missed leads outside business hours.",
-    clientValue:
-      "The client's WhatsApp line now responds instantly to every message, improving customer experience and conversion.",
-  },
-  {
     slug: "ubqari-trust",
-    title: "Ubqari Trust",
+    title: "Ubqari Khidmat-e-Khalq Trust",
+    role: "Freelance project — independent client",
     overview:
-      "A web presence for Ubqari Trust, a non-profit organization that distributes goods, gifts, and funds to under-privileged communities.",
+      "A web presence for Ubqari Khidmat-e-Khalq Trust, a non-profit organization that distributes goods, gifts, and funds to under-privileged communities.",
     problem:
       "The organization needed an online presence that clearly communicates its mission and makes it easy for donors to get involved.",
     solution:
@@ -271,30 +308,33 @@ export const caseStudies = [
     results:
       "A credible, easy-to-navigate site that helps the trust communicate its cause to a wider audience.",
     clientValue:
-      "Ubqari Trust has a professional web presence that supports its outreach and fundraising efforts.",
+      "Ubqari Khidmat-e-Khalq Trust has a professional web presence that supports its outreach and fundraising efforts.",
   },
   {
-    slug: "pureworkathletics",
-    title: "PureWork Athletics",
+    slug: "seo-marketing",
+    title: "SEO Marketing",
+    role: "Freelance project — independent client",
+    // TODO(owner): This entry is a placeholder — swap in the real client/project
+    // details (what was optimized, timeframe, and actual measured results)
+    // from the Admin Dashboard > Portfolio editor before this goes live.
     overview:
-      "A sports training website for a private basketball coaching program associated with NBA-level trainers, including session booking information.",
+      "Search engine optimization work — technical SEO, on-page optimization, and content strategy to improve organic visibility. Add the real project details here.",
     problem:
-      "The client needed a professional site that reflects an elite training brand and makes it simple for athletes to learn about programs and inquire about sessions.",
+      "Add the specific visibility/traffic problem the client was facing before this engagement.",
     solution:
-      "I built a polished, athletic-brand website with program details, trainer bios, and a clear contact path for booking inquiries.",
-    technologies: ["React", "Responsive Design", "SEO"],
+      "Add the specific SEO strategy used — technical fixes, keyword targeting, content, link building, etc.",
+    technologies: ["SEO", "Google Search Console", "Google Analytics"],
     features: [
-      "Trainer & program profiles",
-      "Session info & pricing layout",
-      "Contact-driven booking flow",
-      "Mobile-first responsive design",
+      "Technical SEO audit & fixes",
+      "Keyword research & targeting",
+      "On-page optimization",
+      "Content strategy",
     ],
-    challenges:
-      "Balancing a bold, athletic visual identity with clear, scannable information about programs and pricing.",
+    challenges: "Add the real challenges faced during this engagement.",
     results:
-      "A professional site that reflects the caliber of the training program and converts visitors into inquiries.",
+      "Add real, measured results here (e.g. ranking improvements, traffic growth, conversion changes) once available.",
     clientValue:
-      "The client now has a credible online presence that matches the elite level of their coaching brand.",
+      "Add the concrete value this delivered for the client.",
   },
 ];
 
@@ -435,8 +475,8 @@ export const defaultTestimonials = [
     id: "2",
     quote:
       "Our WhatsApp bot handles customer inquiries 24/7. It saves our team hours every day and improved response times dramatically.",
-    author: "Virtual University",
-    role: "Client, AI WhatsApp Bot Project",
+    author: "Study Group Admin",
+    role: "Virtual University WhatsApp Bot Project",
     rating: 5,
   },
   {

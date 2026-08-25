@@ -2,7 +2,11 @@
 
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
-import { MotionReveal } from "@/components/common/MotionReveal";
+import {
+  MotionReveal,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/common/MotionReveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { EditableText } from "@/components/common/EditableText";
@@ -61,14 +65,21 @@ export function AboutIntroClient({ aboutIntro }: AboutIntroClientProps) {
               contentPathPrefix="home.aboutIntro"
             />
 
-            <div className="mt-6 space-y-4 text-text-secondary leading-relaxed">
-              <EditableText contentPath="home.aboutIntro.paragraph1" as="p">
-                {aboutIntro.paragraph1}
-              </EditableText>
-              <EditableText contentPath="home.aboutIntro.paragraph2" as="p">
-                {aboutIntro.paragraph2}
-              </EditableText>
-            </div>
+            <StaggerContainer
+              className="mt-6 space-y-4 text-text-secondary leading-relaxed"
+              stagger={0.25}
+            >
+              <StaggerItem>
+                <EditableText contentPath="home.aboutIntro.paragraph1" as="p">
+                  {aboutIntro.paragraph1}
+                </EditableText>
+              </StaggerItem>
+              <StaggerItem>
+                <EditableText contentPath="home.aboutIntro.paragraph2" as="p">
+                  {aboutIntro.paragraph2}
+                </EditableText>
+              </StaggerItem>
+            </StaggerContainer>
 
             <ul className="mt-8 space-y-3">
               {aboutIntro.highlights.map((highlight, index) => (

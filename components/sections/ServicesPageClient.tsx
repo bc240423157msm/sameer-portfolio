@@ -84,6 +84,21 @@ export function ServicesPageClient({ services }: ServicesPageClientProps) {
                       </Badge>
                     ))}
                   </div>
+
+                  {service.startingPrice && (
+                    <>
+                      <p className="mt-6 text-xs font-medium uppercase tracking-wider text-text-muted">
+                        Pricing
+                      </p>
+                      <EditableText
+                        contentPath={`services.${index}.startingPrice`}
+                        as="p"
+                        className="mt-2 text-sm font-semibold text-primary"
+                      >
+                        {service.startingPrice}
+                      </EditableText>
+                    </>
+                  )}
                 </div>
               </div>
             </article>

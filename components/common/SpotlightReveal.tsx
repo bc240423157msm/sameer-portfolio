@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { forwardRef } from "react";
-import { isLocalPublicImage, resolveImageSrc } from "@/lib/image-src";
+import { forwardRef, useEffect, useState } from "react";
+import { resolveImageSrc } from "@/lib/image-src";
 
 interface SpotlightRevealProps {
   src: string;
@@ -21,6 +21,16 @@ interface SpotlightRevealProps {
 export const SpotlightReveal = forwardRef<HTMLDivElement, SpotlightRevealProps>(
   function SpotlightReveal({ src, alt, radius = 180 }, ref) {
     const imageSrc = resolveImageSrc(src);
+    // This effect only ever shows on a mouse-driven cursor hover, so it's
+    // useless on touch devices — skip rendering (and downloading) it there
+    // entirely rather than shipping a full-viewport image nobody sees.
+    const [showOnPointer, setShowOnPointer] = useState(false);
+
+    useEffect(() => {
+      setShowOnPointer(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+    }, []);
+
+    if (!showOnPointer) return null;
 
     return (
       <div
@@ -37,7 +47,6 @@ export const SpotlightReveal = forwardRef<HTMLDivElement, SpotlightRevealProps>(
           alt={alt}
           fill
           sizes="100vw"
-          unoptimized={isLocalPublicImage(imageSrc)}
           className="object-cover"
         />
       </div>

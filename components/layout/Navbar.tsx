@@ -8,11 +8,7 @@ import { Container } from "@/components/layout/Container";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import type { NavLink } from "@/types";
 import { navLinks as defaultNavLinks } from "@/lib/site-config";
-import {
-  DEFAULT_LOGO,
-  isLocalPublicImage,
-  resolveImageSrc,
-} from "@/lib/image-src";
+import { DEFAULT_LOGO, resolveImageSrc } from "@/lib/image-src";
 import { cn } from "@/utils/cn";
 
 interface NavbarProps {
@@ -189,7 +185,6 @@ export function Navbar({
               width={220}
               height={54}
               priority
-              unoptimized={isLocalPublicImage(currentLogoSrc)}
               style={{ width: logoWidth, height: "auto", maxWidth: "min(50vw, 320px)" }}
               className="object-contain object-left"
               onError={() => {
